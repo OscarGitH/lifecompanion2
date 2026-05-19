@@ -1,0 +1,15 @@
+[alias]
+format = "fmt --all"
+format-check = "fmt --all -- --check"
+lint = "clippy --all-targets --all-features --fix --allow-dirty --allow-staged"
+lint-check = "clippy --all-targets --all-features"
+
+# START MSVC CONFIG
+[target.x86_64-pc-windows-msvc]
+linker = "lld-link"
+rustflags = [
+    "-Lnative=/opt/xwin/crt/lib/x86_64",
+    "-Lnative=/opt/xwin/sdk/lib/um/x86_64",
+    "-Lnative=/opt/xwin/sdk/lib/ucrt/x86_64",
+]
+# END MSVC CONFIG

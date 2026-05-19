@@ -1,0 +1,17 @@
+{
+	"noContentOnThisCase": "Aucun contenu sur cette case",
+	"tabs": {
+		"page": {
+			"label": "Page"
+		},
+		"content": {
+			"label": "Contenu"
+		},
+		"style": {
+			"label": "Style"
+		},
+		"actions": {
+			"label": "Actions"
+		}
+	}
+}

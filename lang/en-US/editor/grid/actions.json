@@ -1,0 +1,85 @@
+{
+	"createNew": {
+		"label": "Create new config",
+		"description": "Start a new project with a blank structure"
+	},
+	"load": {
+		"label": "Load config",
+		"description": "Open an existing configuration"
+	},
+	"edit": {
+		"label": "Edit page",
+		"description": "Switch to edit mode to customize this page"
+	},
+	"endEdit": {
+		"label": "Exit edition",
+		"description": "Save changes and return to player mode"
+	},
+	"cancelEdit": {
+		"label": "Cancel changes",
+		"description": "Discard changes and return to player mode"
+	},
+	"clear": {
+		"label": "Reset grid",
+		"description": "Clear all current content and start over"
+	},
+	"undo": {
+		"label": "Undo",
+		"description": "Undo the last action"
+	},
+	"redo": {
+		"label": "Redo",
+		"description": "Redo the last undone action"
+	},
+	"unlock": {
+		"label": "Unlock grid",
+		"description": "Unlock the grid to be able to edit this content"
+	},
+	"row": {
+		"addBefore": {
+			"label": "Add above",
+			"description": "Insert a new row above"
+		},
+		"addAfter": {
+			"label": "Add below",
+			"description": "Insert a new row below"
+		},
+		"remove": {
+			"label": "Delete",
+			"description": "Delete the row"
+		}
+	},
+	"col": {
+		"addBefore": {
+			"label": "Add left",
+			"description": "Insert a new column to the left"
+		},
+		"addAfter": {
+			"label": "Add right",
+			"description": "Insert a new column to the right"
+		},
+		"remove": {
+			"label": "Delete",
+			"description": "Delete the column"
+		}
+	},
+	"case": {
+		"add": {
+			"label": "Add",
+			"description": "Add a box",
+			"success": "A box has been added"
+		},
+		"addHere": {
+			"label": "Add case",
+			"description": "Add a box here"
+		},
+		"addNewPage": {
+			"label": "Add page",
+			"description": "Add a page"
+		},
+		"delete": {
+			"label": "Delete",
+			"description": "Delete this box from the grid"
+		}
+	}
+}
