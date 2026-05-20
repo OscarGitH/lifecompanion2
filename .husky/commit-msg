@@ -1,1 +1,0 @@
-make check-commit-msg message="$1"

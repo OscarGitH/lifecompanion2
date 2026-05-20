@@ -1,7 +1,0 @@
-{
-	"_info": "GENERATED - DO NOT EDIT. Source: shared/capabilities/default.json",
-	"identifier": "default",
-	"description": "Capability for the main window",
-	"windows": ["main"],
-	"permissions": ["core:default", "opener:default"]
-}
