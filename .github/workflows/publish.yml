@@ -89,3 +89,11 @@ jobs:
           path: |
             target/lifecompanion-editor/x86_64-pc-windows-msvc/debug/lifecompanion-editor.exe
           if-no-files-found: error
+
+      - name: Upload Android artifacts
+        if: matrix.platform == 'ubuntu-22.04' && matrix.target == 'android'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecompanion-editor-android
+          path: apps/lifecompanion/src-tauri/editor/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk
+          if-no-files-found: error
