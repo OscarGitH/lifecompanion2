@@ -9,7 +9,8 @@ on:
         default: 'windows'
         type: choice
         options:
-          - windows
+          - windows - online
+          - windows - offline
           - linux
           - android
 
@@ -52,9 +53,13 @@ jobs:
         if: inputs.target == 'linux'
         run: make build-linux target=editor bundle=true release=true
 
-      - name: Build Windows
-        if: inputs.target == 'windows'
-        run: make build-windows target=editor bundle=true release=true
+      - name: Build Windows Online
+        if: inputs.target == 'windows - online'
+        run: make build-windows target=editor variant=online bundle=true release=true
+
+      - name: Build Windows Offline
+        if: inputs.target == 'windows - offline'
+        run: make build-windows target=editor variant=offline bundle=true release=true
 
       - name: Build Android
         if: inputs.target == 'android'
@@ -71,11 +76,19 @@ jobs:
             target/lifecompanion-editor/release/bundle/appimage/*.AppImage
           if-no-files-found: error
 
-      - name: Upload Windows artifacts
-        if: inputs.target == 'windows'
+      - name: Upload Windows Online
+        if: inputs.target == 'windows - online'
         uses: actions/upload-artifact@v4
         with:
-          name: lifecompanion-editor-windows
+          name: lifecompanion-editor-windows-online
+          path: target/lifecompanion-editor/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+          if-no-files-found: error
+
+      - name: Upload Windows Offline
+        if: inputs.target == 'windows - offline'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecompanion-editor-windows-offline
           path: target/lifecompanion-editor/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
           if-no-files-found: error
 

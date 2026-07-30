@@ -123,14 +123,17 @@ build-linux: node_modules ## Build linux (?target) (?bundle) (?relase)
 		$(BUNDLE_FLAG) \
 		$(DEBUG_FLAG)
 
+variant ?= online
+
 .PHONY: build-windows
-build-windows: node_modules ## Build windows (?target) (?bundle) (?relase)
+build-windows: node_modules ## Build windows (?target) (?variant: online || offline) (?bundle) (?release)
 	@docker compose run --rm \
 		-w /app/apps/lifecompanion/src-tauri/$(target) \
 		-e TAURI_PLATFORM=windows \
 		dev-lc-windows \
 		cargo tauri build \
 		--target x86_64-pc-windows-msvc \
+		--config tauri.windows-$(variant).conf.json \
 		$(BUNDLE_FLAG) \
 		$(DEBUG_FLAG)
 
