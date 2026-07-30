@@ -1,0 +1,6 @@
+@layer vuetify-overrides {
+  .v-navigation-drawer {
+    border-radius: var(--v-theme-radius-xl);
+    border: var(--v-theme-border);
+  }
+}

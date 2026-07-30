@@ -1,0 +1,63 @@
+services:
+  dev:
+    image: lc:dev
+    pull_policy: never
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+      labels:
+        - "project=lc"
+    volumes:
+      - .:/app:cached
+      - cargo-registry:/usr/local/cargo/registry
+      - cargo-git:/usr/local/cargo/git
+    ports:
+      - 1420:1420
+    user: ${UID:-1000}:${GID:-1000}
+    stdin_open: true
+    tty: true
+
+  dev-host:
+    extends: dev
+    profiles: [ dev-host ]
+    network_mode: host
+
+  dev-lc-tauri:
+    extends: dev
+    profiles: [ dev-lc-tauri ]
+    entrypoint: /app/docker/entrypoints/lc/tauri.sh
+
+  dev-lc-windows:
+    extends: dev
+    profiles: [ dev-lc-windows ]
+    image: lc:dev-lc-windows
+    pull_policy: never
+    build:
+      target: dev-windows
+    entrypoint: /app/docker/entrypoints/lc/tauri-windows.sh
+
+  dev-lc-android:
+    extends: dev-host
+    profiles: [ dev-lc-android ]
+    image: lc:dev-lc-android
+    pull_policy: never
+    build:
+      target: dev-android
+    volumes:
+      - gradle-cache:/home/user/.gradle
+    entrypoint: /app/docker/entrypoints/lc/tauri.sh
+
+volumes:
+  cargo-registry:
+    labels:
+      project: "lc"
+  cargo-git:
+    labels:
+      project: "lc"
+  gradle-cache:
+    labels:
+      project: "lc"

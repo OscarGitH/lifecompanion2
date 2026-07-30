@@ -1,0 +1,27 @@
+{
+	"name": "@lifecompanion/root",
+	"description": "LifeCompanion monorepo",
+	"version": "0.1.0",
+	"private": true,
+	"workspaces": [
+		"apps/*",
+		"packages/*",
+		"bridges/*"
+	],
+	"scripts": {
+		"check": "pnpm check-biome && pnpm check-types && pnpm check-cargo",
+		"check-biome": "biome check",
+		"check-types": "pnpm -r check-types",
+		"check-cargo": "cargo format-check && cargo lint-check",
+		"fix": "pnpm fix-biome && pnpm fix-cargo",
+		"fix-biome": "biome check --write",
+		"fix-cargo": "cargo format && cargo lint",
+		"prepare": "husky"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.5",
+		"@commitlint/cli": "^20.4.1",
+		"@commitlint/config-conventional": "^20.4.1",
+		"husky": "^9.1.7"
+	}
+}

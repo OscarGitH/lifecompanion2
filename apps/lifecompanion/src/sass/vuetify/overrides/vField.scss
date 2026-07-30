@@ -1,0 +1,5 @@
+@layer vuetify-overrides {
+  .v-field {
+    border-radius: var(--v-theme-radius-md) var(--v-theme-radius-md) 0 0;
+  }
+}

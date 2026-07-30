@@ -1,0 +1,15 @@
+[workspace]
+resolver = "2"
+members = [
+    "apps/lifecompanion/src-tauri/shared",
+    "apps/lifecompanion/src-tauri/player",
+    "apps/lifecompanion/src-tauri/editor",
+]
+
+[workspace.lints.rust]
+rust_2018_idioms = { level = "warn", priority = -1 }
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+must_use_candidate = "allow"

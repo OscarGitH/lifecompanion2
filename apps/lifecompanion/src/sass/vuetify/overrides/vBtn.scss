@@ -1,0 +1,9 @@
+@layer vuetify-overrides {
+  .v-btn {
+    border-radius: var(--v-theme-radius-xl);
+  }
+
+  .v-btn:not(.v-btn-group .v-btn, .v-btn--variant-text) {
+    border: var(--v-theme-border);
+  }
+}

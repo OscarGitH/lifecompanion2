@@ -1,0 +1,19 @@
+{
+	"name": "@lifecompanion/model",
+	"description": "LifeCompanion model package",
+	"version": "0.1.0",
+	"private": true,
+	"module": "./src/index.ts",
+	"types": "./src/index.ts",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"check-types": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"es-toolkit": "^1.44.0",
+		"ts-essentials": "^10.2.0",
+		"typescript": "~5.6.3"
+	}
+}

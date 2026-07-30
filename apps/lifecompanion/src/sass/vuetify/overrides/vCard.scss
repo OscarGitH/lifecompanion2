@@ -1,0 +1,6 @@
+@layer vuetify-overrides {
+  .v-card {
+    border-radius: var(--v-theme-radius-xl);
+    border: var(--v-theme-border);
+  }
+}

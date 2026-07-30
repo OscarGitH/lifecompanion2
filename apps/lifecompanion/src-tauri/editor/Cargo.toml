@@ -1,0 +1,22 @@
+[package]
+name = "lifecompanion-editor"
+version = "0.1.0"
+description = "LifeCompanion editor app"
+edition = "2021"
+
+[lib]
+name = "lifecompanion_editor_lib"
+crate-type = ["rlib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+lifecompanion-shared = { path = "../shared" }
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# SHARED_DEPS_START
+tauri-plugin-opener = "2"
+# SHARED_DEPS_END
