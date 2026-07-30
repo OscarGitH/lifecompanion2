@@ -21,8 +21,8 @@ jobs:
 #            args: '--target x86_64-apple-darwin'
           - platform: 'ubuntu-22.04'
             args: ''
-          - platform: 'windows-latest'
-            args: ''
+#          - platform: 'windows-latest'
+#            args: ''
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -50,6 +50,23 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
+
+      - name: Check Docker permissions
+        run: |
+          echo "Runner UID: $(id -u)"
+          echo "Runner GID: $(id -g)"
+          docker compose run --rm dev-lc-tauri sh -c '
+            echo "Container user:"
+            whoami
+            id
+            echo "App permissions:"
+            ls -ld /app
+            echo "Target:"
+            ls -ld /app/target 2>/dev/null || true
+            echo "Test:"
+            touch /app/test-permission
+            rm /app/test-permission
+          '
 
       - uses: tauri-apps/tauri-action@v1
         env:
