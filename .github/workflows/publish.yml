@@ -1,11 +1,9 @@
 name: 'publish'
 
 on:
-#  push:
-#    branches:
-#      - release
-workflow_dispatch:
-
+  push:
+    branches:
+      - release
 
 jobs:
   publish-tauri:
@@ -17,8 +15,8 @@ jobs:
         include:
           - platform: 'ubuntu-22.04'
             target: 'windows'
-          - platform: 'ubuntu-22.04'
-            target: 'android'
+#          - platform: 'ubuntu-22.04'
+#            target: 'android'
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -65,11 +63,10 @@ jobs:
             target/lifecompanion-editor/release/bundle/appimage/*.AppImage
           if-no-files-found: error
 
-      - name: Upload Windows executable
+      - name: Upload Windows artifacts
         if: matrix.target == 'windows'
         uses: actions/upload-artifact@v4
         with:
           name: lifecompanion-editor-windows
-          path: |
-            target/lifecompanion-editor/x86_64-pc-windows-msvc/debug/lifecompanion-editor.exe
+          path: target/lifecompanion-editor/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
           if-no-files-found: error
