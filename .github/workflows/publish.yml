@@ -4,8 +4,8 @@ on:
 #  push:
 #    branches:
 #      - release
+workflow_dispatch:
 
-# This workflow will trigger on each push to the `release` branch to create or update a GitHub release, build your app, and upload the artifacts to the release.
 
 jobs:
   publish-tauri:
@@ -40,7 +40,7 @@ jobs:
           node-version: lts/*
           cache: pnpm
 
-      - name: install dependencies (ubuntu only)
+      - name: install dependencies
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
@@ -53,10 +53,6 @@ jobs:
       - name: Build Windows
         if: matrix.platform == 'ubuntu-22.04' && matrix.target == 'windows'
         run: make build-windows target=editor bundle=true release=true
-
-      - name: Build Android
-        if: matrix.platform == 'ubuntu-22.04' && matrix.target == 'android'
-        run: make build-android target=editor release=true
 
       - name: Upload Linux artifacts
         if: matrix.platform == 'ubuntu-22.04' && matrix.target == 'linux'
@@ -76,12 +72,4 @@ jobs:
           name: lifecompanion-editor-windows
           path: |
             target/lifecompanion-editor/x86_64-pc-windows-msvc/debug/lifecompanion-editor.exe
-          if-no-files-found: error
-
-      - name: Upload Android artifacts
-        if: matrix.platform == 'ubuntu-22.04' && matrix.target == 'android'
-        uses: actions/upload-artifact@v4
-        with:
-          name: lifecompanion-editor-android
-          path: apps/lifecompanion/src-tauri/editor/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk
           if-no-files-found: error
