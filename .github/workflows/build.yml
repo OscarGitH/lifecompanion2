@@ -18,22 +18,7 @@ jobs:
     permissions:
       contents: write
 
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: ubuntu-22.04
-            target: linux
-
-          - runner: ubuntu-22.04
-            target: windows
-
-          - runner: ubuntu-22.04
-            target: android
-
-    if: inputs.target == matrix.target
-
-    runs-on: ${{ matrix.runner }}
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v4
@@ -58,25 +43,25 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: install dependencies
-        if: matrix.target == 'linux'
+        if: inputs.target == 'linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
 
       - name: Build Linux
-        if:  matrix.target == 'linux'
+        if: inputs.target == 'linux'
         run: make build-linux target=editor bundle=true release=true
 
       - name: Build Windows
-        if: matrix.target == 'windows'
+        if: inputs.target == 'windows'
         run: make build-windows target=editor bundle=true release=true
 
       - name: Build Android
-        if: matrix.target == 'android'
+        if: inputs.target == 'android'
         run: make build-android target=editor release=true
 
       - name: Upload Linux artifacts
-        if: matrix.target == 'linux'
+        if: inputs.target == 'linux'
         uses: actions/upload-artifact@v4
         with:
           name: lifecompanion-editor-linux
@@ -87,7 +72,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload Windows artifacts
-        if: matrix.target == 'windows'
+        if: inputs.target == 'windows'
         uses: actions/upload-artifact@v4
         with:
           name: lifecompanion-editor-windows
@@ -95,7 +80,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload Android artifacts
-        if: matrix.target == 'android'
+        if: inputs.target == 'android'
         uses: actions/upload-artifact@v4
         with:
           name: lifecompanion-editor-android
