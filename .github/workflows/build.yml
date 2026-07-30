@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       platform:
-        description: 'Platform to build'
+        description: 'Build target'
         required: true
         default: 'windows'
         type: choice
@@ -56,25 +56,24 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: install dependencies
-        if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
 
       - name: Build Linux
-        if:  matrix.platform == 'ubuntu-22.04' && matrix.target == 'linux'
+        if:  matrix.target == 'linux'
         run: make build-linux target=editor bundle=true release=true
 
       - name: Build Windows
-        if: matrix.platform == 'ubuntu-22.04' && matrix.target == 'windows'
+        if: matrix.target == 'windows'
         run: make build-windows target=editor bundle=true release=true
 
       - name: Build Android
-        if: matrix.platform == 'ubuntu-22.04' && matrix.target == 'android'
+        if: matrix.target == 'android'
         run: make build-android target=editor release=true
 
       - name: Upload Linux artifacts
-        if: matrix.platform == 'ubuntu-22.04' && matrix.target == 'linux'
+        if: matrix.target == 'linux'
         uses: actions/upload-artifact@v4
         with:
           name: lifecompanion-editor-linux
