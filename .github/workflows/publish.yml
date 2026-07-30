@@ -28,6 +28,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set Docker UID/GID
+        run: |
+          echo "UID=$(id -u)" >> "$GITHUB_ENV"
+          echo "GID=$(id -g)" >> "$GITHUB_ENV"
+
+      - name: Check Docker permissions
+        run: |
+          echo "Runner UID: $(id -u)"
+          echo "Runner GID: $(id -g)"
+          docker compose run --rm dev-lc-tauri sh -c '
+            echo "Container user:"
+            whoami
+            id
+            echo "App permissions:"
+            ls -ld /app
+            echo "Test:"
+            touch /app/test-permission
+            rm /app/test-permission
+          '
+
       - name: setup pnpm
         uses: pnpm/action-setup@v6
         with:
