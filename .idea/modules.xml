@@ -2,6 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/apps/lifecompanion/src-tauri/editor/gen/android/app/app.iml" filepath="$PROJECT_DIR$/apps/lifecompanion/src-tauri/editor/gen/android/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/lifecompanion/src-tauri/player/gen/android/app/app2.iml" filepath="$PROJECT_DIR$/apps/lifecompanion/src-tauri/player/gen/android/app/app2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/lifecompanion/src-tauri/editor/gen/android/buildSrc/buildSrc.iml" filepath="$PROJECT_DIR$/apps/lifecompanion/src-tauri/editor/gen/android/buildSrc/buildSrc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/lifecompanion/src-tauri/player/gen/android/buildSrc/buildSrc2.iml" filepath="$PROJECT_DIR$/apps/lifecompanion/src-tauri/player/gen/android/buildSrc/buildSrc2.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/lifecompanion2.iml" filepath="$PROJECT_DIR$/.idea/lifecompanion2.iml" />
     </modules>
   </component>
