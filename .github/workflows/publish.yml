@@ -61,7 +61,7 @@ jobs:
         run: make build-linux target=editor bundle=true release=true
 
       - name: Build Windows
-        if: matrix.platform == 'windows-latest' && matrix.target == 'windows'
+        if: matrix.platform == 'ubuntu-22.04' && matrix.target == 'windows'
         run: make build-windows target=editor bundle=true release=true
 
       - name: List build artifacts
@@ -80,7 +80,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload Windows artifacts
-        if: matrix.platform == 'windows-latest' && matrix.target == 'windows'
+        if: matrix.platform == 'ubuntu-22.04' && matrix.target == 'windows'
         uses: actions/upload-artifact@v4
         with:
           name: lifecompanion-editor-windows
