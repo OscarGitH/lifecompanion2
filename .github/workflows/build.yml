@@ -1,0 +1,85 @@
+name: 'build'
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - linux
+          - windows
+          - android
+
+jobs:
+  build:
+    permissions:
+      contents: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-22.04
+            target: linux
+
+          - runner: ubuntu-22.04
+            target: windows
+
+          - runner: ubuntu-22.04
+            target: android
+
+    if: >
+      inputs.runner == 'all' ||
+      inputs.runner == matrix.target
+
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set Docker UID/GID
+        run: |
+          echo "UID=$(id -u)" >> "$GITHUB_ENV"
+          echo "GID=$(id -g)" >> "$GITHUB_ENV"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        if: matrix.target == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            xdg-utils
+
+      - name: Build Linux
+        if: matrix.target == 'linux'
+        run: make build-linux target=editor bundle=true release=true
+
+      - name: Build Windows
+        if: matrix.target == 'windows'
+        run: make build-windows target=editor bundle=true release=true
+
+      - name: Build Android
+        if: matrix.target == 'android'
+        run: make build-android target=editor release=true
+
