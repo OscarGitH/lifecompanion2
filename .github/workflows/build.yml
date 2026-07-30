@@ -32,10 +32,6 @@ jobs:
           - runner: ubuntu-22.04
             target: android
 
-    if: >
-      inputs.platform == 'all' ||
-      inputs.platform == matrix.target
-
     runs-on: ${{ matrix.runner }}
 
     steps:
@@ -61,7 +57,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install dependencies
-        if: matrix.target == 'linux'
+        if: matrix.target == 'linux' && inputs.platform != 'windows' && inputs.platform != 'android'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -72,14 +68,13 @@ jobs:
             xdg-utils
 
       - name: Build Linux
-        if: matrix.target == 'linux'
+        if: matrix.target == 'linux' && (inputs.platform == 'all' || inputs.platform == 'linux')
         run: make build-linux target=editor bundle=true release=true
 
       - name: Build Windows
-        if: matrix.target == 'windows'
+        if: matrix.target == 'windows' && (inputs.platform == 'all' || inputs.platform == 'windows')
         run: make build-windows target=editor bundle=true release=true
 
       - name: Build Android
-        if: matrix.target == 'android'
+        if: matrix.target == 'android' && (inputs.platform == 'all' || inputs.platform == 'android')
         run: make build-android target=editor release=true
-
