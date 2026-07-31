@@ -1,0 +1,46 @@
+name: 'build_linux'
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Application to build'
+        required: true
+        default: 'editor'
+        type: choice
+        options:
+          - editor
+          - player
+          - sharded
+
+jobs:
+  build:
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Setup build environment
+        uses: .github/workflows/setup-build/setup_build_ubuntu.yml
+
+      # --------------------
+      # Build
+      # --------------------
+
+      - name: Build Linux
+        run: make build-linux target=${{ inputs.target }} bundle=true release=true
+
+      # --------------------
+      # Store artifact
+      # --------------------
+
+      - name: Store linux as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecompanion-${{ inputs.target }}-linux
+          path: |
+            target/lifecompanion-${{ inputs.target }}/release/bundle/deb/*.deb
+            target/lifecompanion-${{ inputs.target }}/release/bundle/rpm/*.rpm
+            target/lifecompanion-${{ inputs.target }}/release/bundle/appimage/*.AppImage
+          if-no-files-found: error

@@ -6,95 +6,26 @@ on:
       - release
 
 jobs:
-  publish-tauri:
-    permissions:
-      contents: write
 
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: 'ubuntu-22.04'
-            target: 'linux'
-          - platform: 'ubuntu-22.04'
-            target: 'windows'
-            variant: 'online'
-          - platform: 'ubuntu-22.04'
-            target: 'windows'
-            variant: 'offline'
-          - platform: 'ubuntu-22.04'
-            target: 'android'
-            variant: 'aab'
+  linux:
+    uses: ./.github/workflows/build_linux.yml
+    with:
+      target: editor
 
-    runs-on: ${{ matrix.platform }}
+  windows-online:
+    uses: ./.github/workflows/build_windows.yml
+    with:
+      target: editor
+      build: windows - online
 
-    steps:
-      - uses: actions/checkout@v4
+  windows-offline:
+    uses: ./.github/workflows/build_windows.yml
+    with:
+      target: editor
+      build: windows - offline
 
-      - name: Set Docker UID/GID
-        run: |
-          echo "UID=$(id -u)" >> "$GITHUB_ENV"
-          echo "GID=$(id -g)" >> "$GITHUB_ENV"
-
-      - name: setup pnpm
-        uses: pnpm/action-setup@v6
-        with:
-          version: 11
-
-      - name: setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: pnpm
-
-      - name: install dependencies
-        if: matrix.platform == 'ubuntu-22.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
-
-      # --------------------
-      # Build
-      # --------------------
-
-      - name: Build Linux
-        if: matrix.target == 'linux'
-        run: make build-linux target=editor bundle=true release=true
-
-      - name: Build Windows - ${{ matrix.variant }}
-        if: matrix.target == 'windows'
-        run: make build-windows target=editor variant=${{ matrix.variant }} bundle=true release=true
-
-      - name: Build Android - ${{ matrix.variant }}
-        if: matrix.target == 'android - aab'
-        run: make build-android target=editor format=${{ matrix.variant }} release=true
-
-      # --------------------
-      # Store artifact
-      # --------------------
-      - name: Store Windows ${{ matrix.variant }} as artifact
-        if: inputs.build == 'windows'
-        uses: actions/upload-artifact@v4
-        with:
-          name: lifecompanion-editor-windows-${{ matrix.variant }}
-          path: target/lifecompanion-editor/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
-          if-no-files-found: error
-
-      - name: Store Linux as artifact
-        if: matrix.target == 'linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: lifecompanion-editor-linux
-          path: |
-            target/lifecompanion-editor/release/bundle/deb/*.deb
-            target/lifecompanion-editor/release/bundle/rpm/*.rpm
-            target/lifecompanion-editor/release/bundle/appimage/*.AppImage
-          if-no-files-found: error
-
-      - name: Store android ${{ matrix.variant }} as artifact
-        if: inputs.target == 'android'
-        uses: actions/upload-artifact@v4
-        with:
-          name: lifecompanion-editor-android-${{ matrix.variant }}
-          path: apps/lifecompanion/src-tauri/editor/gen/android/app/build/outputs/bundle/universalRelease/*.aab
-          if-no-files-found: error
+  android:
+    uses: ./.github/workflows/build_android.yml
+    with:
+      target: editor
+      build: android - release aab

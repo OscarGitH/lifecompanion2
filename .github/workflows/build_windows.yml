@@ -1,0 +1,68 @@
+name: 'build_windows'
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Application to build'
+        required: true
+        default: 'editor'
+        type: choice
+        options:
+          - editor
+          - player
+          - sharded
+
+      build:
+        description: 'Build type'
+        required: true
+        default: 'windows - online'
+        type: choice
+        options:
+          - windows - online
+          - windows - offline
+
+jobs:
+  build:
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Setup build environment
+        uses: .github/workflows/setup-build/setup_build_ubuntu.yml
+
+      # --------------------
+      # Build
+      # --------------------
+
+      - name: Build Windows Online
+        if: inputs.build == 'windows - online'
+        run: make build-windows target=${{ inputs.target }} variant=online bundle=true release=true
+
+      - name: Build Windows Offline
+        if: inputs.build == 'windows - offline'
+        run: make build-windows target=${{ inputs.target }} variant=offline bundle=true release=true
+
+      # --------------------
+      # Store artifact
+      # --------------------
+
+      - name: Store Windows Online as artifact
+        if: inputs.build == 'windows - online'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecompanion-${{ inputs.target }}-windows-online
+          path: target/lifecompanion-${{ inputs.target }}/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+          if-no-files-found: error
+
+      - name: Store Windows Offline as artifact
+        if: inputs.build == 'windows - offline'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecompanion-${{ inputs.target }}-windows-offline
+          path: target/lifecompanion-${{ inputs.target }}/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+          if-no-files-found: error
+
+

@@ -1,0 +1,66 @@
+name: 'build_android'
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Application to build'
+        required: true
+        default: 'editor'
+        type: choice
+        options:
+          - editor
+          - player
+          - sharded
+
+      build:
+        description: 'Build type'
+        required: true
+        default: 'android - debug apk'
+        type: choice
+        options:
+          - android - debug apk
+          - android - release aab
+
+jobs:
+  build:
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Setup build environment
+        uses: .github/workflows/setup-build/setup_build_ubuntu.yml
+
+      # --------------------
+      # Build
+      # --------------------
+
+      - name: Build Android AAB
+        if: inputs.build == 'android - aab'
+        run: make build-android target=${{ inputs.target }} android_format=aab release=true
+
+      - name: Build Android APK
+        if: inputs.build == 'android - debug apk'
+        run: make build-android target=${{ inputs.target }} android_format=apk
+
+      # --------------------
+      # Store artifact
+      # --------------------
+
+      - name: Store android APK as artifact
+        if: inputs.build == 'android - debug apk'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecompanion-${{ inputs.target }}-android-apk
+          path: apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/apk/universal/debug/*.apk
+          if-no-files-found: error
+
+      - name: Store android AAB as artifact
+        if: inputs.build == 'android - aab'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecompanion-${{ inputs.target }}-android-aab
+          path: apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/bundle/universalRelease/*.aab
+          if-no-files-found: error
