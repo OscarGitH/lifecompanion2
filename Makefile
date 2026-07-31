@@ -123,28 +123,29 @@ build-linux: node_modules ## Build linux (?target) (?bundle) (?relase)
 		$(BUNDLE_FLAG) \
 		$(DEBUG_FLAG)
 
-variant ?= online
-
+windows_variant ?= online
 .PHONY: build-windows
-build-windows: node_modules ## Build windows (?target) (?variant: online || offline) (?bundle) (?release)
+build-windows: node_modules ## Build windows (?target) (?windows_variant: online || offline) (?bundle) (?release)
 	@docker compose run --rm \
 		-w /app/apps/lifecompanion/src-tauri/$(target) \
 		-e TAURI_PLATFORM=windows \
 		dev-lc-windows \
 		cargo tauri build \
 		--target x86_64-pc-windows-msvc \
-		--config tauri.windows-$(variant).conf.json \
+		--config tauri.windows-$(windows_variant).conf.json \
 		$(BUNDLE_FLAG) \
 		$(DEBUG_FLAG)
 
+android_format ?= apk
 .PHONY: build-android
-build-android: node_modules ## Build android apk/aab (?target) (?relase)
+build-android: node_modules ## Build android (?target: editor || player) (?android_format: apk || aab) (?release)
 	@docker compose run --rm \
 		-w /app/apps/lifecompanion/src-tauri/$(target) \
 		-e GRADLE_USER_HOME=/home/user/.gradle/$(target) \
 		-e TAURI_PLATFORM=android \
 		dev-lc-android \
 		cargo tauri android build \
+		--$(android_format) \
 		$(DEBUG_FLAG)
 
 ##

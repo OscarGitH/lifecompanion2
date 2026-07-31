@@ -4,15 +4,26 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: 'Build target'
+        description: 'Application to build'
         required: true
-        default: 'windows'
+        default: 'editor'
+        type: choice
+        options:
+          - editor
+          - player
+          - sharded
+
+      build:
+        description: 'Build type'
+        required: true
+        default: 'windows - online'
         type: choice
         options:
           - windows - online
           - windows - offline
           - linux
-          - android
+          - android - debug apk
+          - android - release aab
 
 jobs:
   build:
@@ -44,58 +55,77 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: install dependencies
-        if: inputs.target == 'linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
 
-      - name: Build Linux
-        if: inputs.target == 'linux'
-        run: make build-linux target=editor bundle=true release=true
+      # --------------------
+      # Build
+      # --------------------
 
       - name: Build Windows Online
-        if: inputs.target == 'windows - online'
-        run: make build-windows target=editor variant=online bundle=true release=true
+        if: inputs.build == 'windows - online'
+        run: make build-windows target=${{ inputs.target }} variant=online bundle=true release=true
 
       - name: Build Windows Offline
-        if: inputs.target == 'windows - offline'
-        run: make build-windows target=editor variant=offline bundle=true release=true
+        if: inputs.build == 'windows - offline'
+        run: make build-windows target=${{ inputs.target }} variant=offline bundle=true release=true
 
-      - name: Build Android
-        if: inputs.target == 'android'
-        run: make build-android target=editor release=true
+      - name: Build Linux
+        if: inputs.build == 'linux'
+        run: make build-linux target=${{ inputs.target }} bundle=true release=true
 
-      - name: Upload Linux artifacts
-        if: inputs.target == 'linux'
+      - name: Build Android AAB
+        if: inputs.build == 'android - aab'
+        run: make build-android target=${{ inputs.target }} android_format=aab release=true
+
+      - name: Build Android APK
+        if: inputs.build == 'android - debug apk'
+        run: make build-android target=${{ inputs.target }} android_format=apk
+
+      # --------------------
+      # Store artifact
+      # --------------------
+
+      - name: Store Windows Online as artifact
+        if: inputs.build == 'windows - online'
         uses: actions/upload-artifact@v4
         with:
-          name: lifecompanion-editor-linux
+          name: lifecompanion-${{ inputs.target }}-windows-online
+          path: target/lifecompanion-${{ inputs.target }}/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+          if-no-files-found: error
+
+      - name: Store Windows Offline as artifact
+        if: inputs.build == 'windows - offline'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecompanion-${{ inputs.target }}-windows-offline
+          path: target/lifecompanion-${{ inputs.target }}/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+          if-no-files-found: error
+
+      - name: Store linux as artifact
+        if: inputs.build == 'linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecompanion-${{ inputs.target }}-linux
           path: |
-            target/lifecompanion-editor/release/bundle/deb/*.deb
-            target/lifecompanion-editor/release/bundle/rpm/*.rpm
-            target/lifecompanion-editor/release/bundle/appimage/*.AppImage
+            target/lifecompanion-${{ inputs.target }}/release/bundle/deb/*.deb
+            target/lifecompanion-${{ inputs.target }}/release/bundle/rpm/*.rpm
+            target/lifecompanion-${{ inputs.target }}/release/bundle/appimage/*.AppImage
           if-no-files-found: error
 
-      - name: Upload Windows Online
-        if: inputs.target == 'windows - online'
+      - name: Store android APK as artifact
+        if: inputs.build == 'android - debug apk'
         uses: actions/upload-artifact@v4
         with:
-          name: lifecompanion-editor-windows-online
-          path: target/lifecompanion-editor/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+          name: lifecompanion-${{ inputs.target }}-android-apk
+          path: apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/apk/universal/debug/*.apk
           if-no-files-found: error
 
-      - name: Upload Windows Offline
-        if: inputs.target == 'windows - offline'
+      - name: Store android AAB as artifact
+        if: inputs.build == 'android - aab'
         uses: actions/upload-artifact@v4
         with:
-          name: lifecompanion-editor-windows-offline
-          path: target/lifecompanion-editor/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
-          if-no-files-found: error
-
-      - name: Upload Android artifacts
-        if: inputs.target == 'android'
-        uses: actions/upload-artifact@v4
-        with:
-          name: lifecompanion-editor-android
-          path: apps/lifecompanion/src-tauri/editor/gen/android/app/build/outputs/apk/universal/debug/*.apk
+          name: lifecompanion-${{ inputs.target }}-android-aab
+          path: apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/bundle/universalRelease/*.aab
           if-no-files-found: error

@@ -9,6 +9,7 @@ jobs:
   publish-tauri:
     permissions:
       contents: write
+
     strategy:
       fail-fast: false
       matrix:
@@ -23,6 +24,7 @@ jobs:
             variant: 'offline'
           - platform: 'ubuntu-22.04'
             target: 'android'
+            variant: 'aab'
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -50,16 +52,26 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
 
+      # --------------------
+      # Build
+      # --------------------
       - name: Build Linux
-        if:  matrix.platform == 'ubuntu-22.04' && matrix.target == 'linux'
+        if:  matrix.target == 'linux'
         run: make build-linux target=editor bundle=true release=true
 
       - name: Build Windows
         if: matrix.target == 'windows'
         run: make build-windows target=editor variant=${{ matrix.variant }} bundle=true release=true
 
+      - name: Build Android
+        if: matrix.target == 'android'
+        run: make build-android target=editor format=${{ matrix.variant }} release=true
+
+      # --------------------
+      # Store artifact
+      # --------------------
       - name: Upload Linux artifacts
-        if: matrix.platform == 'ubuntu-22.04' && matrix.target == 'linux'
+        if: matrix.target == 'linux'
         uses: actions/upload-artifact@v4
         with:
           name: lifecompanion-editor-linux
@@ -75,4 +87,12 @@ jobs:
         with:
           name: lifecompanion-editor-windows
           path: target/lifecompanion-editor/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+          if-no-files-found: error
+
+      - name: Upload Android artifacts
+        if: inputs.target == 'android'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecompanion-editor-android
+          path: apps/lifecompanion/src-tauri/editor/gen/android/app/build/outputs/bundle/universalRelease/*.aab
           if-no-files-found: error
