@@ -13,6 +13,13 @@ on:
           - player
           - sharded
 
+  workflow_call:
+    inputs:
+      target:
+        description: 'Application to build'
+        required: true
+        type: string
+
 jobs:
   build:
     permissions:
