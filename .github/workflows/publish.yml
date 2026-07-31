@@ -55,8 +55,9 @@ jobs:
       # --------------------
       # Build
       # --------------------
+
       - name: Build Linux
-        if:  matrix.target == 'linux'
+        if: matrix.target == 'linux'
         run: make build-linux target=editor bundle=true release=true
 
       - name: Build Windows
@@ -70,6 +71,14 @@ jobs:
       # --------------------
       # Store artifact
       # --------------------
+      - name: Store Windows ${{ matrix.variant }} as artifact
+        if: inputs.build == 'windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecompanion-editor-windows-${{ matrix.variant }}
+          path: target/lifecompanion-editor/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+          if-no-files-found: error
+
       - name: Upload Linux artifacts
         if: matrix.target == 'linux'
         uses: actions/upload-artifact@v4
@@ -79,14 +88,6 @@ jobs:
             target/lifecompanion-editor/release/bundle/deb/*.deb
             target/lifecompanion-editor/release/bundle/rpm/*.rpm
             target/lifecompanion-editor/release/bundle/appimage/*.AppImage
-          if-no-files-found: error
-
-      - name: Upload Windows installer
-        if: matrix.target == 'windows'
-        uses: actions/upload-artifact@v4
-        with:
-          name: lifecompanion-editor-windows
-          path: target/lifecompanion-editor/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
           if-no-files-found: error
 
       - name: Upload Android artifacts
