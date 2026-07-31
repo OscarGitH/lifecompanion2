@@ -5,6 +5,7 @@ runs:
   using: composite
   steps:
     - name: Set Docker UID/GID
+      shell: bash
       run: |
         echo "UID=$(id -u)" >> "$GITHUB_ENV"
         echo "GID=$(id -g)" >> "$GITHUB_ENV"
@@ -24,6 +25,7 @@ runs:
       uses: dtolnay/rust-toolchain@stable
 
     - name: install dependencies
+      shell: bash
       run: |
         sudo apt-get update
         sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
