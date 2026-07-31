@@ -238,8 +238,11 @@ bash-lc-android: ## Open a bash in a new dev-lc-android container
 publish:
 	@git diff --exit-code > /dev/null 2>&1 || { echo "❌ Unstaged changes found, cancelling."; exit 1; }
 	@git diff --cached --exit-code > /dev/null 2>&1 || { echo "❌ Uncommitted changes found, cancelling."; exit 1; }
-	@pnpm version $(c) --no-git-tag-version
-	@git add package.json pnpm-lock.yaml
+	@docker compose run --rm \
+		-w /app/apps/lifecompanion \
+		dev \
+		pnpm version $(c) --no-git-tag-version
+	@git add apps/lifecompanion/package.json apps/lifecompanion/pnpm-lock.yaml
 	@git commit -m "chore: release v$(c)"
 	@git tag "v$(c)"
 
