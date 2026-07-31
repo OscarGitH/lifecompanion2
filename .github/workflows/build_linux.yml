@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Setup build environment
-        uses: .github/workflows/setup-build/setup_build_ubuntu.yml
+        uses: ./.github/actions/setup_build_ubuntu
 
       # --------------------
       # Build
