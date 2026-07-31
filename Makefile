@@ -240,12 +240,25 @@ publish:
 	@git diff --cached --exit-code > /dev/null 2>&1 || { echo "❌ Uncommitted changes found, cancelling."; exit 1; }
 
 	@echo "📦 Updating package version to $(c)..."
+
 	@docker compose run --rm \
 		-w /app/apps/lifecompanion \
 		dev \
 		pnpm version $(c) --no-git-tag-version
 
-	@git add apps/lifecompanion/package.json pnpm-lock.yaml apps/lifecompanion/src-tauri/$(target)
+	@echo "🦀 Updating Tauri/Cargo version to $(c)..."
+
+	@docker compose run --rm \
+		-w /app/apps/lifecompanion/src-tauri \
+		dev \
+		cargo set-version $(c)
+
+	@git add \
+		apps/lifecompanion/package.json \
+		pnpm-lock.yaml \
+		apps/lifecompanion/src-tauri/Cargo.toml \
+		apps/lifecompanion/src-tauri/Cargo.lock
+
 	@git commit -m "chore: release v$(c)"
 	@git tag "v$(c)"
 
