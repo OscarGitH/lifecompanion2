@@ -1,6 +1,17 @@
-name: 'build_android'
+name: 'publish_android'
 
 on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Application to build'
+        required: true
+        default: 'editor'
+        type: choice
+        options:
+          - editor
+          - player
+
   workflow_call:
     inputs:
       target:

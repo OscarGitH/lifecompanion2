@@ -30,18 +30,11 @@ runs:
     # Store artifact
     # --------------------
 
-    - name: Store android APK as artifact
-      if: inputs.build == 'apk'
+    - name: Store android ${{ inputs.build }} as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: lifecompanion-${{ inputs.target }}-android-apk
-        path: apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/apk/universal/debug/*.apk
-        if-no-files-found: error
-
-    - name: Store android AAB as artifact
-      if: inputs.build == 'aab'
-      uses: actions/upload-artifact@v4
-      with:
-        name: lifecompanion-${{ inputs.target }}-android-aab
-        path: apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/bundle/universalRelease/*.aab
+        name: lifecompanion-${{ inputs.target }}-android-${{ inputs.build }}
+        path:
+          apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/apk/universal/debug/*.apk
+          apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/bundle/universalRelease/*.aab
         if-no-files-found: error
