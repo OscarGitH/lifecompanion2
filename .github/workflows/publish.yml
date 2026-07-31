@@ -28,4 +28,4 @@ jobs:
     uses: ./.github/workflows/build_android.yml
     with:
       target: editor
-      build: android - release aab
+      build: aab

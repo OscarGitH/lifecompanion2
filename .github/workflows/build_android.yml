@@ -16,11 +16,11 @@ on:
       build:
         description: 'Build type'
         required: true
-        default: 'android - debug apk'
+        default: 'apk'
         type: choice
         options:
-          - android - debug apk
-          - android - release aab
+          - apk
+          - aab
 
   workflow_call:
     inputs:
@@ -50,11 +50,11 @@ jobs:
       # --------------------
 
       - name: Build Android AAB
-        if: inputs.build == 'android - aab'
+        if: inputs.build == 'aab'
         run: make build-android target=${{ inputs.target }} android_format=aab release=true
 
       - name: Build Android APK
-        if: inputs.build == 'android - debug apk'
+        if: inputs.build == 'apk'
         run: make build-android target=${{ inputs.target }} android_format=apk
 
       # --------------------
@@ -62,7 +62,7 @@ jobs:
       # --------------------
 
       - name: Store android APK as artifact
-        if: inputs.build == 'android - debug apk'
+        if: inputs.build == 'apk'
         uses: actions/upload-artifact@v4
         with:
           name: lifecompanion-${{ inputs.target }}-android-apk
@@ -70,7 +70,7 @@ jobs:
           if-no-files-found: error
 
       - name: Store android AAB as artifact
-        if: inputs.build == 'android - aab'
+        if: inputs.build == 'aab'
         uses: actions/upload-artifact@v4
         with:
           name: lifecompanion-${{ inputs.target }}-android-aab
