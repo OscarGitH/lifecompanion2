@@ -50,11 +50,11 @@ jobs:
 
       - name: Build Windows Online
         if: inputs.build == 'windows - online'
-        run: make build-windows target=${{ inputs.target }} variant=online bundle=true release=true
+        run: make build-windows target=${{ inputs.target }} windows_variant=online bundle=true release=true
 
       - name: Build Windows Offline
         if: inputs.build == 'windows - offline'
-        run: make build-windows target=${{ inputs.target }} variant=offline bundle=true release=true
+        run: make build-windows target=${{ inputs.target }} windows_variant=offline bundle=true release=true
 
       # --------------------
       # Store artifact
