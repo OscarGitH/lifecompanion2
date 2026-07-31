@@ -11,7 +11,6 @@ on:
         options:
           - editor
           - player
-          - sharded
 
   workflow_call:
     inputs:

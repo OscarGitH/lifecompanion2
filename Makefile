@@ -31,6 +31,8 @@ ALL_FLAG = $(if $(filter 1 true,$(all)),--all,)
 .DEFAULT_GOAL:=help
 c ?= --help
 target ?= editor
+windows_variant ?= online
+android_format ?= apk
 
 ##
 ## —— Docker ——————————————————————————————————————————————————————————————————
@@ -123,9 +125,8 @@ build-linux: node_modules ## Build linux (?target) (?bundle) (?relase)
 		$(BUNDLE_FLAG) \
 		$(DEBUG_FLAG)
 
-windows_variant ?= online
 .PHONY: build-windows
-build-windows: node_modules ## Build windows (?target) (?windows_variant: online || offline) (?bundle) (?release)
+build-windows: node_modules ## Build windows (?target) (?windows_variant) (?bundle) (?release)
 	@docker compose run --rm \
 		-w /app/apps/lifecompanion/src-tauri/$(target) \
 		-e TAURI_PLATFORM=windows \
@@ -136,9 +137,8 @@ build-windows: node_modules ## Build windows (?target) (?windows_variant: online
 		$(BUNDLE_FLAG) \
 		$(DEBUG_FLAG)
 
-android_format ?= apk
 .PHONY: build-android
-build-android: node_modules ## Build android (?target: editor || player) (?android_format: apk || aab) (?release)
+build-android: node_modules ## Build android (?target) (?android_format) (?release)
 	@docker compose run --rm \
 		-w /app/apps/lifecompanion/src-tauri/$(target) \
 		-e GRADLE_USER_HOME=/home/user/.gradle/$(target) \
@@ -246,6 +246,8 @@ help: ## Display this help
 ##
 ## —— Arguments definitions (? = optional) ————————————————————————————————————
 ## target=(player|editor)         Specify target endpoint (default: editor)
+## windows_variant=(online|offline) Specify windows variant (default: online)
+## android_format=(apk|aab)       Specify android format (default: apk)
 ##
 ## bundle=(1|true)                Build with installer
 ## release=(1|true)               Build as release

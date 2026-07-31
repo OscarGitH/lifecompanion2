@@ -11,7 +11,6 @@ on:
         options:
           - editor
           - player
-          - sharded
 
       build:
         description: 'Build type'
