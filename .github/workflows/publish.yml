@@ -27,6 +27,7 @@ jobs:
             variant: 'aab'
 
     runs-on: ${{ matrix.platform }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -60,12 +61,12 @@ jobs:
         if: matrix.target == 'linux'
         run: make build-linux target=editor bundle=true release=true
 
-      - name: Build Windows
+      - name: Build Windows - ${{ matrix.variant }}
         if: matrix.target == 'windows'
         run: make build-windows target=editor variant=${{ matrix.variant }} bundle=true release=true
 
-      - name: Build Android
-        if: matrix.target == 'android'
+      - name: Build Android - ${{ matrix.variant }}
+        if: matrix.target == 'android - aab'
         run: make build-android target=editor format=${{ matrix.variant }} release=true
 
       # --------------------
@@ -79,7 +80,7 @@ jobs:
           path: target/lifecompanion-editor/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
           if-no-files-found: error
 
-      - name: Upload Linux artifacts
+      - name: Store Linux as artifact
         if: matrix.target == 'linux'
         uses: actions/upload-artifact@v4
         with:
@@ -90,10 +91,10 @@ jobs:
             target/lifecompanion-editor/release/bundle/appimage/*.AppImage
           if-no-files-found: error
 
-      - name: Upload Android artifacts
+      - name: Store android ${{ matrix.variant }} as artifact
         if: inputs.target == 'android'
         uses: actions/upload-artifact@v4
         with:
-          name: lifecompanion-editor-android
+          name: lifecompanion-editor-android-${{ matrix.variant }}
           path: apps/lifecompanion/src-tauri/editor/gen/android/app/build/outputs/bundle/universalRelease/*.aab
           if-no-files-found: error
