@@ -1,0 +1,46 @@
+name: 'build_android'
+
+on:
+  workflow_call:
+    inputs:
+      target:
+        description: 'Application to build'
+        required: true
+        type: string
+
+jobs:
+  build:
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup build environment
+        uses: ./.github/actions/setup_build
+
+      # --------------------
+      # Build
+      # --------------------
+
+      - name: Build Android
+        uses: ./.github/actions/build_android
+        with:
+          target: ${{ inputs.target }}
+          build: 'aab'
+
+      # --------------------
+      # Deploy to Google Play
+      # --------------------
+
+      - name: Deploy to Google Play
+        if: github.ref_type == 'tag'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          packageName: org.lifecompanion2.${{ inputs.target }}
+          releaseFiles: apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/bundle/universalRelease/*.aab
+          track: ${{ env.TRACK }}
+        env:
+          TRACK: ${{ steps.publication.outputs.APP_TRACK }}

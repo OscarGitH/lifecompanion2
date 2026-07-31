@@ -9,24 +9,23 @@ on:
 jobs:
 
   linux:
-    uses: ./.github/workflows/build_linux.yml
+    uses: ./.github/workflows/build/build_linux.yml
     with:
       target: editor
 
   windows-online:
-    uses: ./.github/workflows/build_windows.yml
+    uses: ./.github/workflows/build/build_windows.yml
     with:
       target: editor
       build: windows - online
 
   windows-offline:
-    uses: ./.github/workflows/build_windows.yml
+    uses: ./.github/workflows/build/build_windows.yml
     with:
       target: editor
       build: windows - offline
 
   android:
-    uses: ./.github/workflows/build_android.yml
+    uses: ./.github/workflows/publish_android.yml
     with:
       target: editor
-      build: aab

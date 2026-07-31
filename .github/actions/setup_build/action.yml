@@ -1,0 +1,11 @@
+name: setup_build
+description: Setup common LifeCompanion build environment
+
+runs:
+  using: composite
+  steps:
+    - name: Set Docker UID/GID
+      shell: bash
+      run: |
+        echo "UID=$(id -u)" >> "$GITHUB_ENV"
+        echo "GID=$(id -g)" >> "$GITHUB_ENV"

@@ -1,0 +1,47 @@
+name: build android
+description: Build Android application (APK or AAB)
+
+inputs:
+  target:
+    description: 'Application to build'
+    required: true
+  build:
+    description: 'Build type'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    # --------------------
+    # Build
+    # --------------------
+
+    - name: Build Android AAB
+      if: inputs.build == 'aab'
+      shell: bash
+      run: make build-android target=${{ inputs.target }} android_format=aab release=true
+
+    - name: Build Android APK
+      if: inputs.build == 'apk'
+      shell: bash
+      run: make build-android target=${{ inputs.target }} android_format=apk
+
+    # --------------------
+    # Store artifact
+    # --------------------
+
+    - name: Store android APK as artifact
+      if: inputs.build == 'apk'
+      uses: actions/upload-artifact@v4
+      with:
+        name: lifecompanion-${{ inputs.target }}-android-apk
+        path: apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/apk/universal/debug/*.apk
+        if-no-files-found: error
+
+    - name: Store android AAB as artifact
+      if: inputs.build == 'aab'
+      uses: actions/upload-artifact@v4
+      with:
+        name: lifecompanion-${{ inputs.target }}-android-aab
+        path: apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/bundle/universalRelease/*.aab
+        if-no-files-found: error

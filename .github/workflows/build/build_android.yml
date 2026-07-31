@@ -1,0 +1,55 @@
+name: 'build_android'
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Application to build'
+        required: true
+        default: 'editor'
+        type: choice
+        options:
+          - editor
+          - player
+
+      build:
+        description: 'Build type'
+        required: true
+        default: 'apk'
+        type: choice
+        options:
+          - apk
+          - aab
+
+  workflow_call:
+    inputs:
+      target:
+        description: 'Application to build'
+        required: true
+        type: string
+      build:
+        description: 'Build type'
+        required: true
+        type: string
+
+jobs:
+  build:
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup build environment
+        uses: ./.github/actions/setup_build
+
+      # --------------------
+      # Build
+      # --------------------
+
+      - name: Build Android
+        uses: ./.github/actions/build_android
+        with:
+          target: ${{ inputs.target }}
+          build: ${{ inputs.build }}
