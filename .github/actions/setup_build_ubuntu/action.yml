@@ -4,8 +4,6 @@ description: Setup common LifeCompanion build environment for Ubuntu
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
-
     - name: Set Docker UID/GID
       run: |
         echo "UID=$(id -u)" >> "$GITHUB_ENV"

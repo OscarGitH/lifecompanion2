@@ -26,6 +26,9 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Setup build environment
         uses: ./.github/actions/setup_build_ubuntu
 
