@@ -39,6 +39,8 @@ services:
     build:
       target: dev-windows
     entrypoint: /app/docker/entrypoints/lc/tauri-windows.sh
+    env_file:
+      - .env
 
   dev-lc-android:
     extends: dev-host

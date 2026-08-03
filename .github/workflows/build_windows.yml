@@ -65,7 +65,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lifecompanion-${{ inputs.target }}-windows-online
-          path: target/lifecompanion-${{ inputs.target }}/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+          path: |
+            target/lifecompanion-${{ inputs.target }}/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+            target/lifecompanion-${{ inputs.target }}/x86_64-pc-windows-msvc/release/bundle/nsis/*.sig
           if-no-files-found: error
 
       - name: Store Windows Offline as artifact
@@ -73,7 +75,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lifecompanion-${{ inputs.target }}-windows-offline
-          path: target/lifecompanion-${{ inputs.target }}/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+          path: |
+            target/lifecompanion-${{ inputs.target }}/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+            target/lifecompanion-${{ inputs.target }}/x86_64-pc-windows-msvc/release/bundle/nsis/*.sig
           if-no-files-found: error
 
 
