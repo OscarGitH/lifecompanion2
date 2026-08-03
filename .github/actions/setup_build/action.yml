@@ -1,6 +1,14 @@
 name: setup_build
 description: Setup common LifeCompanion build environment
 
+inputs:
+  tauri-signing-private-key:
+    description: Tauri signing private key
+    required: true
+  tauri-signing-private-key-password:
+    description: Tauri signing password
+    required: true
+
 runs:
   using: composite
   steps:
@@ -9,10 +17,14 @@ runs:
       run: |
         echo "UID=$(id -u)" >> "$GITHUB_ENV"
         echo "GID=$(id -g)" >> "$GITHUB_ENV"
+
     - name: Setup Tauri signing
       shell: bash
+      env:
+        TAURI_SIGNING_PRIVATE_KEY: ${{ inputs.tauri-signing-private-key }}
+        TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ inputs.tauri-signing-private-key-password }}
       run: |
         cat > .env <<EOF
-        TAURI_SIGNING_PRIVATE_KEY=${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        TAURI_SIGNING_PRIVATE_KEY_PASSWORD=${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        TAURI_SIGNING_PRIVATE_KEY=$TAURI_SIGNING_PRIVATE_KEY
+        TAURI_SIGNING_PRIVATE_KEY_PASSWORD=$TAURI_SIGNING_PRIVATE_KEY_PASSWORD
         EOF
