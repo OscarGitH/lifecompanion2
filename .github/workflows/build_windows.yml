@@ -55,9 +55,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          projectPath: apps/lifecompanion/src-tauri/${{ inputs.app }}
-          tagName: ${{ inputs.app }}-v__VERSION__
-          releaseName: '${{ inputs.app }} v__VERSION__'
+          projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
+          tagName: ${{ inputs.target }}-v__VERSION__
+          releaseName: '${{ inputs.target }} v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: false
           prerelease: false
