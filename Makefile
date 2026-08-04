@@ -157,8 +157,7 @@ publish: ## Publish release (?target) (?c)
 	@git diff --cached --exit-code > /dev/null 2>&1 || { echo "Uncommitted changes found, cancelling." && exit 1; }
 	@echo "Publishing $(target) v$(c)"
 	@$(MAKE) lc-pnpm c="version $(c) --no-git-tag-version"
-	@$(MAKE) lc-cargo target=editor c="set-version $(c)"
-	@$(MAKE) lc-cargo target=player c="set-version $(c)"
+	@$(MAKE) lc-pnpm c="cargo set-version $(c)"
 
 ##
 ## —— Commands ————————————————————————————————————————————————————————————————
