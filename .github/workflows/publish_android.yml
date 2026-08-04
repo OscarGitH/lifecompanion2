@@ -30,6 +30,9 @@ jobs:
 
       - name: Setup build environment
         uses: ./.github/actions/setup_build
+        with:
+          tauri-signing-private-key: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          tauri-signing-private-key-password: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
       - name: Setup Android signing
         run: |
