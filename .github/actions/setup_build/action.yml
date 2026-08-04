@@ -24,6 +24,11 @@ runs:
         TAURI_SIGNING_PRIVATE_KEY: ${{ inputs.tauri-signing-private-key }}
         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ inputs.tauri-signing-private-key-password }}
       run: |
+        echo "Private key set: $([[ -n "$TAURI_SIGNING_PRIVATE_KEY" ]] && echo yes || echo no)"
+        echo "Private key length: ${#TAURI_SIGNING_PRIVATE_KEY}"
+        echo "Password set: $([[ -n "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" ]] && echo yes || echo no)"
+        echo "Password length: ${#TAURI_SIGNING_PRIVATE_KEY_PASSWORD}"
+        
         cat > .env <<EOF
         TAURI_SIGNING_PRIVATE_KEY=$TAURI_SIGNING_PRIVATE_KEY
         TAURI_SIGNING_PRIVATE_KEY_PASSWORD=$TAURI_SIGNING_PRIVATE_KEY_PASSWORD
