@@ -4,10 +4,10 @@ description: Setup common LifeCompanion build environment
 inputs:
   tauri-signing-private-key:
     description: Tauri signing private key
-    required: true
+    required: false
   tauri-signing-private-key-password:
     description: Tauri signing password
-    required: true
+    required: false
 
 runs:
   using: composite
@@ -24,7 +24,12 @@ runs:
         TAURI_SIGNING_PRIVATE_KEY: ${{ inputs.tauri-signing-private-key }}
         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ inputs.tauri-signing-private-key-password }}
       run: |
-        cat > .env <<EOF
-        TAURI_SIGNING_PRIVATE_KEY=$TAURI_SIGNING_PRIVATE_KEY
-        TAURI_SIGNING_PRIVATE_KEY_PASSWORD=$TAURI_SIGNING_PRIVATE_KEY_PASSWORD
-        EOF
+        if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+          cat > .env <<EOF
+          TAURI_SIGNING_PRIVATE_KEY=$TAURI_SIGNING_PRIVATE_KEY
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD=$TAURI_SIGNING_PRIVATE_KEY_PASSWORD
+          EOF
+          echo "Tauri signing configured"
+        else
+          echo "Tauri signing skipped"
+        fi
