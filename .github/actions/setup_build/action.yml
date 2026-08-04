@@ -2,6 +2,9 @@ name: setup_build
 description: Setup common LifeCompanion build environment
 
 inputs:
+  target:
+    description: Application to build (player or editor)
+    required: true
   tauri-signing-private-key:
     description: Tauri signing private key
     required: true
@@ -12,11 +15,23 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Set Docker UID/GID
+    - name: setup node
       shell: bash
-      run: |
-        echo "UID=$(id -u)" >> "$GITHUB_ENV"
-        echo "GID=$(id -g)" >> "$GITHUB_ENV"
+      uses: actions/setup-node@v6
+      with:
+        node-version: lts/*
+        cache: pnpm
+
+    - name: Rust cache
+      shell: bash
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: apps/lifecompanion/src-tauri/${{ inputs.target }} -> target
+
+    - name: install frontend dependencies
+      shell: bash
+      run: pnpm install
+
 
     - name: Setup Tauri signing
       shell: bash

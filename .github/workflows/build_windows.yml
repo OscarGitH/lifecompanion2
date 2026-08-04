@@ -35,15 +35,15 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-22.04
+    runs-on: windows-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup build environment
         uses: ./.github/actions/setup_build
         with:
+          target: ${{ inputs.target }}
           tauri-signing-private-key: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           tauri-signing-private-key-password: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
@@ -51,36 +51,14 @@ jobs:
       # Build
       # --------------------
 
-      - name: Build Windows Online
-        if: inputs.build == 'windows - online'
-        run: make build-windows target=${{ inputs.target }} windows_variant=online bundle=true release=true
-
-      - name: Build Windows Offline
-        if: inputs.build == 'windows - offline'
-        run: make build-windows target=${{ inputs.target }} windows_variant=offline bundle=true release=true
-
-      # --------------------
-      # Store artifact
-      # --------------------
-
-      - name: Store Windows Online as artifact
-        if: inputs.build == 'windows - online'
-        uses: actions/upload-artifact@v4
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: lifecompanion-${{ inputs.target }}-windows-online
-          path: |
-            target/lifecompanion-${{ inputs.target }}/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
-            target/lifecompanion-${{ inputs.target }}/x86_64-pc-windows-msvc/release/bundle/nsis/*.sig
-          if-no-files-found: error
-
-      - name: Store Windows Offline as artifact
-        if: inputs.build == 'windows - offline'
-        uses: actions/upload-artifact@v4
-        with:
-          name: lifecompanion-${{ inputs.target }}-windows-offline
-          path: |
-            target/lifecompanion-${{ inputs.target }}/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
-            target/lifecompanion-${{ inputs.target }}/x86_64-pc-windows-msvc/release/bundle/nsis/*.sig
-          if-no-files-found: error
-
-
+          projectPath: apps/lifecompanion/src-tauri/${{ inputs.app }}
+          tagName: ${{ inputs.app }}-v__VERSION__
+          releaseName: '${{ inputs.app }} v__VERSION__'
+          releaseBody: 'See the assets to download this version and install.'
+          releaseDraft: false
+          prerelease: false
+          args: ''
