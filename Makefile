@@ -155,7 +155,8 @@ publish:
 	@git diff --quiet || { echo "Unstaged changes found."; exit 1; }
 	@git diff --cached --quiet || { echo "Uncommitted changes found."; exit 1; }
 	@$(MAKE) lc-pnpm c="version --no-git-tag-version $(c)"
-	@$(MAKE) lc-cargo c="set-version --manifest-path src-tauri/Cargo.toml $npm_package_version"
+	@$(MAKE) lc-cargo c="set-version --manifest-path apps/lifecompanion/src-tauri/editor/Cargo.toml $npm_package_version"
+	@$(MAKE) lc-cargo c="set-version --manifest-path apps/lifecompanion/src-tauri/player/Cargo.toml $npm_package_version"
 #	@git add -A
 #	@git commit -m "chore: release v$(c)"
 #	@git tag "v$(c)"
