@@ -15,15 +15,14 @@ inputs:
 runs:
   using: composite
   steps:
+
     - name: setup node
-      shell: bash
       uses: actions/setup-node@v6
       with:
         node-version: lts/*
         cache: pnpm
 
     - name: Rust cache
-      shell: bash
       uses: swatinem/rust-cache@v2
       with:
         workspaces: apps/lifecompanion/src-tauri/${{ inputs.target }} -> target
@@ -31,7 +30,6 @@ runs:
     - name: install frontend dependencies
       shell: bash
       run: pnpm install
-
 
     - name: Setup Tauri signing
       shell: bash
