@@ -62,6 +62,17 @@ jobs:
       - name: install frontend dependencies
         run: pnpm install
 
+      - name: Setup Tauri signing
+        shell: bash
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          cat > .env <<EOF
+          TAURI_SIGNING_PRIVATE_KEY=$TAURI_SIGNING_PRIVATE_KEY
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD=$TAURI_SIGNING_PRIVATE_KEY_PASSWORD
+          EOF
+
       # --------------------
       # Build
       # --------------------
