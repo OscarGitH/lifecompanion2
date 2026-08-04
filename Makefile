@@ -155,8 +155,8 @@ publish:
 	@git diff --quiet || { echo "Unstaged changes found."; exit 1; }
 	@git diff --cached --quiet || { echo "Uncommitted changes found."; exit 1; }
 	@$(MAKE) lc-pnpm c="version --no-git-tag-version $(c)"
-	@$(MAKE) lc-cargo target="editor" c="set-version --manifest-path Cargo.toml $npm_package_version"
-	@$(MAKE) lc-cargo target="player" c="set-version --manifest-path Cargo.toml $npm_package_version"
+	@$(MAKE) lc-cargo target="editor" c="set-version --manifest-path Cargo.toml $(c)"
+	@$(MAKE) lc-cargo target="player" c="set-version --manifest-path Cargo.toml $(c)"
 #	@git add -A
 #	@git commit -m "chore: release v$(c)"
 #	@git tag "v$(c)"
