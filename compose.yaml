@@ -30,6 +30,8 @@ services:
     extends: dev
     profiles: [ dev-lc-tauri ]
     entrypoint: /app/docker/entrypoints/lc/tauri.sh
+    env_file:
+      - .env
 
   dev-lc-windows:
     extends: dev
