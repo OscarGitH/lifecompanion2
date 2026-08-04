@@ -151,12 +151,13 @@ build-android: node_modules ## Build android (?target) (?android_format) (?relea
 ##
 ## —— Publish ————————————————————————————————————————————————————————————————
 .PHONY: publish
-publish: ## Publish release (?target) (?c)
-	@git diff --exit-code > /dev/null 2>&1 || { echo "Unstaged changes found, cancelling." && exit 1; }
-	@git diff --cached --exit-code > /dev/null 2>&1 || { echo "Uncommitted changes found, cancelling." && exit 1; }
+publish:
+	@git diff --quiet || { echo "Unstaged changes found."; exit 1; }
+	@git diff --cached --quiet || { echo "Uncommitted changes found."; exit 1; }
 	@$(MAKE) lc-pnpm c="version --no-git-tag-version $(c)"
-	@git commit -a -m "chore: release v$$($(DOCKER_EXEC) app pnpm --silent current-version)"
-	@git tag "v$$($(DOCKER_EXEC) app pnpm --silent current-version)"
+	@git add -A
+	@git commit -m "chore(release): v$(c)"
+	@git tag "v$(c)"
 
 ##
 ## —— Commands ————————————————————————————————————————————————————————————————
