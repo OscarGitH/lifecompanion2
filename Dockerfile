@@ -45,7 +45,7 @@ FROM rust:slim-bookworm AS rust
 LABEL project="lc"
 
 RUN rustup component add rustfmt clippy
-RUN cargo install tauri-cli
+RUN cargo install tauri-cli cargo-edit
 
 # =====================================================
 # Stage — Dev environment
