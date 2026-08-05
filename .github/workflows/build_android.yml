@@ -90,31 +90,17 @@ jobs:
           base64 -d <<< "${{ secrets.TAURI_ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
           echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
 
-      - name: Setup build arguments
-        shell: bash
-        run: |
-          if [ "${{ inputs.build }}" = "aab" ]; then
-            echo "TAURI_ANDROID_PACKAGE=--aab" >> $GITHUB_ENV
-          else
-            echo "TAURI_ANDROID_PACKAGE=--apk" >> $GITHUB_ENV
-          fi
-          
-          if [ "${{ inputs.mode }}" = "release" ]; then
-            echo "TAURI_ANDROID_MODE=--release" >> $GITHUB_ENV
-          else
-            echo "TAURI_ANDROID_MODE=--debug" >> $GITHUB_ENV
-          fi
-
       # --------------------
       # Build
       # --------------------
 
       - name: Build Android
+        working-directory: apps/lifecompanion
         run: |
           pnpm exec tauri android build \
-            --project-path apps/lifecompanion/src-tauri/${{ inputs.target }} \
-            ${{ env.TAURI_ANDROID_PACKAGE }} \
-            ${{ env.TAURI_ANDROID_MODE }}
+            --project-path src-tauri/${{ inputs.target }} \
+            --${{ inputs.build }} \
+            --${{ inputs.mode }}
 
       - name: Upload Android artifact
         uses: actions/upload-artifact@v5
