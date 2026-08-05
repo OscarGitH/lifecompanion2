@@ -110,9 +110,9 @@ jobs:
       # --------------------
 
       - name: Build Android
-        working-directory: apps/lifecompanion/src-tauri/${{ inputs.target }}
         run: |
           pnpm exec tauri android build \
+            --project-path apps/lifecompanion/src-tauri/${{ inputs.target }} \
             ${{ env.TAURI_ANDROID_PACKAGE }} \
             ${{ env.TAURI_ANDROID_MODE }}
 
