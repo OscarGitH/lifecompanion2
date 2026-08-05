@@ -89,19 +89,22 @@ jobs:
 
 
       - name: Install Tauri CLI
-        run: cargo install tauri-cli --version "^2"
+        run: |
+          pnpm add -g @tauri-apps/cli
 
-      - name: Generate Android
-        run: cargo tauri android init
+      - name: Init Android
+        run: |
+          pnpm tauri android init
         working-directory: apps/lifecompanion/src-tauri/${{ inputs.target }}
 
       # --------------------
       # Build
       # --------------------
 
-      - name: Build APK
-        run: ./gradlew assembleRelease
-        working-directory: apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android
+      - name: Build Android
+        run: |
+          pnpm exec tauri android build --${{ inputs.build }}
+        working-directory: apps/lifecompanion
 
       - name: Upload Android artifact
         uses: actions/upload-artifact@v5
