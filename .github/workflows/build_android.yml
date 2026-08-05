@@ -11,7 +11,6 @@ on:
         options:
           - editor
           - player
-
       build:
         description: 'Build type'
         required: true
@@ -20,15 +19,6 @@ on:
         options:
           - apk
           - aab
-
-      mode:
-        description: 'Build mode'
-        required: true
-        default: 'release'
-        type: choice
-        options:
-          - debug
-          - release
 
   workflow_call:
     inputs:
@@ -40,13 +30,9 @@ on:
         description: 'Build type'
         required: true
         type: string
-      mode:
-        description: 'Build mode'
-        required: true
-        type: string
 
 jobs:
-  publish-tauri:
+  build_linux:
     permissions:
       contents: write
 
@@ -55,11 +41,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Setup Java
-        uses: actions/setup-java@v5
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+      - name: install dependencies (ubuntu only)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
 
       - name: setup pnpm
         uses: pnpm/action-setup@v4
@@ -72,23 +57,16 @@ jobs:
           node-version: 26.1.0
           cache: pnpm
 
-      - name: Setup Rust target directory
-        run: |
-          echo "CARGO_TARGET_DIR=${{ github.workspace }}/target/${{ inputs.target }}" >> $GITHUB_ENV
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './apps/lifecompanion/src-tauri/${{ inputs.target }} -> target'
 
       - name: install frontend dependencies
         run: pnpm install
 
-      - name: Setup Android signing
-        run: |
-          cd apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android
-          echo "keyAlias=${{ secrets.TAURI_ANDROID_KEY_ALIAS }}" > keystore.properties
-          echo "password=${{ secrets.TAURI_ANDROID_KEY_PASSWORD }}" >> keystore.properties
-          base64 -d <<< "${{ secrets.TAURI_ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
-          echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
-
       # --------------------
-      # Build
+      # Build and Save Artifacts
       # --------------------
 
       - uses: tauri-apps/tauri-action@v1
@@ -99,14 +77,11 @@ jobs:
         with:
           projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
 
+          releaseDraft: false
+
+          uploadWorkflowArtifacts: true
+          uploadUpdaterSignatures: false
+
           args: ''
-
-          tagName: android-${{ inputs.target }} v__VERSION__
-
-          releaseDraft: ${{ inputs.publish }}
-          releaseName: 'android-${{ inputs.target }} v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-
-          uploadUpdaterJson: ${{ inputs.publish }}
 
           mobile: 'android'
