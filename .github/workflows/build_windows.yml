@@ -41,6 +41,7 @@ on:
       publish:
         required: true
         type: boolean
+
 jobs:
   publish-tauri:
     permissions:

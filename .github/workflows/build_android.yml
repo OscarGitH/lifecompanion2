@@ -21,11 +21,14 @@ on:
           - apk
           - aab
 
-      publish:
-        description: 'Publish GitHub release'
+      mode:
+        description: 'Build mode'
         required: true
-        default: false
-        type: boolean
+        default: 'release'
+        type: choice
+        options:
+          - debug
+          - release
 
   workflow_call:
     inputs:
@@ -37,9 +40,10 @@ on:
         description: 'Build type'
         required: true
         type: string
-      publish:
+      mode:
+        description: 'Build mode'
         required: true
-        type: boolean
+        type: string
 
 jobs:
   publish-tauri:
@@ -50,11 +54,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-
-      - name: install dependencies (ubuntu only)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -94,13 +93,13 @@ jobs:
       - name: Setup build arguments
         shell: bash
         run: |
-          if [ "${{ inputs.package }}" = "aab" ]; then
+          if [ "${{ inputs.build }}" = "aab" ]; then
             echo "TAURI_ANDROID_PACKAGE=--aab" >> $GITHUB_ENV
           else
             echo "TAURI_ANDROID_PACKAGE=--apk" >> $GITHUB_ENV
           fi
           
-          if [ "${{ inputs.publish }}" = "true" ]; then
+          if [ "${{ inputs.mode }}" = "release" ]; then
             echo "TAURI_ANDROID_MODE=--release" >> $GITHUB_ENV
           else
             echo "TAURI_ANDROID_MODE=--debug" >> $GITHUB_ENV
@@ -110,18 +109,17 @@ jobs:
       # Build
       # --------------------
 
-      - uses: tauri-apps/tauri-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-        with:
-          projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
-          args: android build ${{ env.TAURI_ANDROID_PACKAGE }} ${{ env.TAURI_ANDROID_MODE }}
-          tagName: android-${{ inputs.target }}-v__VERSION__
-          releaseName: 'android-${{ inputs.target }}-v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-          uploadWorkflowArtifacts: ${{ inputs.publish }}
-          uploadUpdaterJson: ${{ inputs.publish }}
-          releaseDraft: ${{ inputs.publish }}
+      - name: Build Android
+        working-directory: apps/lifecompanion/src-tauri/${{ inputs.target }}
+        run: |
+          pnpm exec tauri android build \
+            ${{ env.TAURI_ANDROID_PACKAGE }} \
+            ${{ env.TAURI_ANDROID_MODE }}
 
+      - name: Upload Android artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: android-${{ inputs.build }}-${{ inputs.target }}
+          path: |
+            apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/**/*.apk
+            apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/**/*.aab
