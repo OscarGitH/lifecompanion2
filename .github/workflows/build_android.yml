@@ -61,9 +61,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android
-        uses: android-actions/setup-android@v3
-
       - name: setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -94,14 +91,9 @@ jobs:
       # Build
       # --------------------
 
-      - name: Build Android
-        working-directory: apps/lifecompanion
-        run: |
-          pnpm exec tauri android build \
-            --${{ inputs.build }} \
-            --${{ inputs.mode }} \
-            -- \
-            src-tauri/${{ inputs.target }}
+      - name: Build APK
+        run: ./gradlew assembleRelease
+        working-directory: apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android
 
       - name: Upload Android artifact
         uses: actions/upload-artifact@v5
