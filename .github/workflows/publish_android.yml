@@ -20,7 +20,9 @@ on:
         type: string
 
 jobs:
-  build:
+  publish-tauri:
+    permissions:
+      contents: write
 
     runs-on: ubuntu-22.04
 
@@ -42,6 +44,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
+
+      # Cache Rust dependencies and build artifacts between GitHub Actions runs to reduce build time.
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/lifecompanion/src-tauri/${{ inputs.target }} -> target
 
       - name: install frontend dependencies
         run: pnpm install
