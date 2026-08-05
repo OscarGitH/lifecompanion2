@@ -70,5 +70,5 @@ jobs:
           uploadUpdaterSignatures: true
           uploadUpdaterJson: true
 
-          args: ${{ matrix.args }}
+          args: `${{ matrix.args }} --release`
 

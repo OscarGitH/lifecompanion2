@@ -11,11 +11,24 @@ on:
         options:
           - editor
           - player
+      status:
+        description: 'Build status'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - debug
+
 
   workflow_call:
     inputs:
       target:
         description: 'Application to build'
+        required: true
+        type: string
+      status:
+        description: 'Build status'
         required: true
         type: string
 
@@ -74,4 +87,4 @@ jobs:
           uploadWorkflowArtifacts: true
           uploadUpdaterSignatures: false
 
-          args: ''
+          args: '--${{ inputs.status }}'

@@ -19,6 +19,14 @@ on:
         options:
           - online
           - offline
+      status:
+        description: 'Build status'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - debug
 
   workflow_call:
     inputs:
@@ -28,6 +36,10 @@ on:
         type: string
       build:
         description: 'Build type'
+        required: true
+        type: string
+      status:
+        description: 'Build status'
         required: true
         type: string
 
@@ -77,4 +89,4 @@ jobs:
           uploadWorkflowArtifacts: true
           uploadUpdaterSignatures: false
 
-          args: --config tauri.windows-${{ inputs.build }}.conf.json
+          args: --config tauri.windows-${{ inputs.build }}.conf.json --${{ inputs.status }}
