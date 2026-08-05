@@ -62,17 +62,6 @@ jobs:
       - name: install frontend dependencies
         run: pnpm install
 
-      - name: Setup Tauri signing
-        shell: bash
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-        run: |
-          cat > .env <<EOF
-          TAURI_SIGNING_PRIVATE_KEY=$TAURI_SIGNING_PRIVATE_KEY
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD=$TAURI_SIGNING_PRIVATE_KEY_PASSWORD
-          EOF
-
       # --------------------
       # Build
       # --------------------
@@ -80,6 +69,8 @@ jobs:
       - uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
           tagName: ${{ inputs.target }}-v__VERSION__
