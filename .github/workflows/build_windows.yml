@@ -57,7 +57,7 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-         workspaces: apps/lifecompanion/src-tauri/${{ inputs.target }} -> target
+          workspaces: apps/lifecompanion/src-tauri/${{ inputs.target }} -> target/${{ inputs.target }}
 
       - name: install frontend dependencies
         run: pnpm install
