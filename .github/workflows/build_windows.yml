@@ -11,7 +11,6 @@ on:
         options:
           - editor
           - player
-
       build:
         description: 'Build type'
         required: true
@@ -20,12 +19,6 @@ on:
         options:
           - online
           - offline
-
-      publish:
-        description: 'Publish GitHub release'
-        required: true
-        default: false
-        type: boolean
 
   workflow_call:
     inputs:
@@ -38,12 +31,10 @@ on:
         required: true
         type: string
 
-      publish:
-        required: true
-        type: boolean
-
 jobs:
-  build:
+  build_windows:
+    permissions:
+      contents: write
 
     runs-on: windows-latest
 
@@ -64,18 +55,13 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          # This matches tauri's default project layout. Change this if you have a different layout.
           workspaces: './apps/lifecompanion/src-tauri/${{ inputs.target }} -> target'
-
-      - name: Setup Rust target directory
-        run: |
-          echo "CARGO_TARGET_DIR=${{ github.workspace }}/target/${{ inputs.target }}" >> $GITHUB_ENV
 
       - name: install frontend dependencies
         run: pnpm install
 
       # --------------------
-      # Build
+      # Build and Artifacts
       # --------------------
 
       - uses: tauri-apps/tauri-action@v1
@@ -86,11 +72,11 @@ jobs:
         with:
           projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
 
-
-          tagName: LifeCompanion-windows-v__VERSION__
-          releaseName: 'LifeCompanion-windows v__VERSION__'
+          tagName: LifeCompanion-windows-${{ inputs.build }}-v__VERSION__
+          releaseName: 'LifeCompanion-windows-${{ inputs.build }} v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
-          prerelease: false
+
+          uploadWorkflowArtifacts: true
+          uploadUpdaterSignatures: false
 
           args: --config tauri.windows-${{ inputs.build }}.conf.json

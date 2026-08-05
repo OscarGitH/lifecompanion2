@@ -12,12 +12,6 @@ on:
           - editor
           - player
 
-      publish:
-        description: 'Publish GitHub release'
-        required: true
-        default: false
-        type: boolean
-
   workflow_call:
     inputs:
       target:
@@ -25,12 +19,8 @@ on:
         required: true
         type: string
 
-      publish:
-        required: true
-        type: boolean
-
 jobs:
-  publish-tauri:
+  build_linux:
     permissions:
       contents: write
 
@@ -55,9 +45,14 @@ jobs:
           node-version: 26.1.0
           cache: pnpm
 
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './apps/lifecompanion/src-tauri/${{ inputs.target }} -> target'
+
       - name: Setup Rust target directory
         run: |
-          echo "CARGO_TARGET_DIR=${{ github.workspace }}/target/${{ inputs.target }}" >> $GITHUB_ENV
+          echo "CARGO_TARGET_DIR=${{ github.workspace }}/apps/lifecompanion/src-tauri/${{ inputs.target }}" >> $GITHUB_ENV
 
       - name: install frontend dependencies
         run: pnpm install
@@ -74,14 +69,11 @@ jobs:
         with:
           projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
 
-          args: --config tauri.conf.json
-
-          tagName: linux-${{ inputs.target }}-v__VERSION__
-
-
-          releaseDraft: ${{ inputs.publish }}
-          releaseName: 'linux-${{ inputs.target }} v__VERSION__'
+          tagName: LifeCompanion-linux-${{ inputs.build }}-v__VERSION__
+          releaseName: 'LifeCompanion-linux-${{ inputs.build }} v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
 
-          uploadUpdaterJson: ${{ inputs.publish }}
+          uploadWorkflowArtifacts: true
+          uploadUpdaterSignatures: false
 
+          args: ''
