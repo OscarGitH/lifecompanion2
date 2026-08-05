@@ -97,7 +97,11 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: './apps/lifecompanion/src-tauri/${{ inputs.target }} -> ../../target'
+          workspaces: './apps/lifecompanion/src-tauri/${{ inputs.target }} -> target'
+
+      - name: Setup Rust target directory
+        run: |
+          echo "CARGO_TARGET_DIR=${{ github.workspace }}/apps/lifecompanion/src-tauri/${{ inputs.target }}" >> $GITHUB_ENV
 
       - name: init mobile project
         run: |
@@ -122,6 +126,6 @@ jobs:
           uploadWorkflowArtifacts: true
           uploadUpdaterSignatures: false
 
-          args: '--${{ inputs.status }}'
+          args: '--${{ inputs.build }} --${{ inputs.status }}'
 
           mobile: 'android'
