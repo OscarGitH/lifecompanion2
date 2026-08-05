@@ -39,3 +39,22 @@ make web      # Start the Web server
 make linux    # Launch the Linux app (Wayland)
 make android  # Launch the Android app (via ADB)
 ```
+
+## Publishing updates
+
+### Build release on local machine
+To build a release version of the application, complete the .env file with the TAURI_SIGNING_PRIVATE_KEY and TAURI_SIGNING_PRIVATE_KEY_PASSWORD variables.
+
+Then run the following example command to build the Windows release:
+
+```sh
+make windows-build target=editor bundle=true release=true
+```
+
+
+### Deployment
+To deploy a new version, just bump a new NPM version using:
+
+make publish c="--new-version 1.0.0"
+
+Once done, you can git push with the creating tag, and the GitHub workflow will run to build and publish the new version to the app stores.
