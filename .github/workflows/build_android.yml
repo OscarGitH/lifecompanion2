@@ -62,11 +62,13 @@ jobs:
           node-version: 26.1.0
           cache: pnpm
 
+      - name: Setup Rust target directory
+        run: |
+          echo "CARGO_TARGET_DIR=${{ github.workspace }}/target/${{ inputs.target }}" >> $GITHUB_ENV
+
       # Cache Rust dependencies and build artifacts between GitHub Actions runs to reduce build time.
       - name: Rust cache
         uses: swatinem/rust-cache@v2
-        with:
-          workspaces: apps/lifecompanion/src-tauri/${{ inputs.target }} -> target/${{ inputs.target }}
 
       - name: install frontend dependencies
         run: pnpm install
@@ -78,10 +80,6 @@ jobs:
           echo "password=${{ secrets.TAURI_ANDROID_KEY_PASSWORD }}" >> keystore.properties
           base64 -d <<< "${{ secrets.TAURI_ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
           echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
-
-      - name: Setup Rust target directory
-        run: |
-          echo "CARGO_TARGET_DIR=${{ github.workspace }}/target/${{ inputs.target }}" >> $GITHUB_ENV
 
       # --------------------
       # Build

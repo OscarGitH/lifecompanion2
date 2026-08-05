@@ -45,18 +45,16 @@ jobs:
           node-version: 26.1.0
           cache: pnpm
 
-      # Cache Rust dependencies and build artifacts between GitHub Actions runs to reduce build time.
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: apps/lifecompanion/src-tauri/${{ inputs.target }} -> target/${{ inputs.target }}
-
-      - name: install frontend dependencies
-        run: pnpm install
-
       - name: Setup Rust target directory
         run: |
           echo "CARGO_TARGET_DIR=${{ github.workspace }}/target/${{ inputs.target }}" >> $GITHUB_ENV
+
+      # Cache Rust dependencies and build artifacts between GitHub Actions runs to reduce build time.
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+
+      - name: install frontend dependencies
+        run: pnpm install
 
       # --------------------
       # Build
