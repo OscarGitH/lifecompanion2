@@ -104,7 +104,7 @@ jobs:
       - name: Build Android
         run: |
           pnpm exec tauri android build --${{ inputs.build }}
-        working-directory: apps/lifecompanion
+        working-directory: apps/lifecompanion/src-tauri/${{ inputs.target }}
 
       - name: Upload Android artifact
         uses: actions/upload-artifact@v5
