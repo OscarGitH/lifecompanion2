@@ -42,6 +42,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: install dependencies (ubuntu only)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
+
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
@@ -92,7 +97,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
-          args: --config tauri.conf.json
+          args: ''
           tagName: android-${{ inputs.target }}-v__VERSION__
           releaseName: 'android-${{ inputs.target }}-v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
