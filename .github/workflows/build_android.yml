@@ -87,6 +87,11 @@ jobs:
           base64 -d <<< "${{ secrets.TAURI_ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
           echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
 
+      - name: Generate Android project
+        run: |
+          pnpm tauri android init
+        working-directory: apps/lifecompanion/src-tauri/${{ inputs.target }}
+
       # --------------------
       # Build
       # --------------------
