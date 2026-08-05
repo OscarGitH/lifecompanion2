@@ -109,7 +109,7 @@ jobs:
         with:
           projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
 
-          args: --config tauri.conf.json
+          args: ''
 
           tagName: android-${{ inputs.target }} v__VERSION__
 
