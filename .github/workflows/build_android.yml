@@ -61,6 +61,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Setup Android
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android dependencies
+        run: |
+          sdkmanager "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0" \
+            "ndk;27.0.12077973"
+
       - name: setup pnpm
         uses: pnpm/action-setup@v4
         with:
