@@ -81,11 +81,13 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
-          args: --config tauri.windows-${{ inputs.build }}.conf.json
-          tagName: windows-${{ inputs.build }}-${{ inputs.target }}-v__VERSION__
-          releaseName: 'windows-${{ inputs.build }}-${{ inputs.target }}-v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-          uploadWorkflowArtifacts: ${{ inputs.publish }}
-          uploadUpdaterJson: ${{ inputs.publish }}
-          releaseDraft: ${{ inputs.publish }}
 
+          args: --config tauri.windows-${{ inputs.build }}.conf.json
+
+          tagName: windows-${{ inputs.build }}-${{ inputs.target }}-v__VERSION__
+
+          releaseDraft: ${{ inputs.publish }}
+          releaseName: 'windows-${{ inputs.build }}-${{ inputs.target }} v__VERSION__'
+          releaseBody: 'See the assets to download this version and install.'
+
+          uploadUpdaterJson: ${{ inputs.publish }}

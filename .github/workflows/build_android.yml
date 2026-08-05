@@ -87,29 +87,26 @@ jobs:
           base64 -d <<< "${{ secrets.TAURI_ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
           echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
 
-
-      - name: Install Tauri CLI
-        run: |
-          pnpm add -g @tauri-apps/cli
-
-      - name: Init Android
-        run: |
-          pnpm tauri android init
-        working-directory: apps/lifecompanion/src-tauri/${{ inputs.target }}
-
       # --------------------
       # Build
       # --------------------
 
-      - name: Build Android
-        run: |
-          pnpm exec tauri android build --${{ inputs.build }}
-        working-directory: apps/lifecompanion/src-tauri/${{ inputs.target }}
-
-      - name: Upload Android artifact
-        uses: actions/upload-artifact@v5
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          name: android-${{ inputs.build }}-${{ inputs.target }}
-          path: |
-            apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/**/*.apk
-            apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android/app/build/outputs/**/*.aab
+          projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
+
+          args: --config tauri.conf.json
+
+          tagName: android-${{ inputs.target }} v__VERSION__
+
+          releaseDraft: ${{ inputs.publish }}
+          releaseName: 'android-${{ inputs.target }} v__VERSION__'
+          releaseBody: 'See the assets to download this version and install.'
+
+          uploadUpdaterJson: ${{ inputs.publish }}
+
+          mobile: 'android'

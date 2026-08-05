@@ -73,11 +73,15 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
+
           args: --config tauri.conf.json
+
           tagName: linux-${{ inputs.target }}-v__VERSION__
-          releaseName: 'linux-${{ inputs.target }}-v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-          uploadWorkflowArtifacts: ${{ inputs.publish }}
-          uploadUpdaterJson: ${{ inputs.publish }}
+
+
           releaseDraft: ${{ inputs.publish }}
+          releaseName: 'linux-${{ inputs.target }} v__VERSION__'
+          releaseBody: 'See the assets to download this version and install.'
+
+          uploadUpdaterJson: ${{ inputs.publish }}
 
