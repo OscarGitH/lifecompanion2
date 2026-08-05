@@ -43,9 +43,7 @@ on:
         type: boolean
 
 jobs:
-  publish-tauri:
-    permissions:
-      contents: write
+  build:
 
     runs-on: windows-latest
 
@@ -62,6 +60,12 @@ jobs:
         with:
           node-version: 26.1.0
           cache: pnpm
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          # This matches tauri's default project layout. Change this if you have a different layout.
+          workspaces: './apps/lifecompanion/src-tauri/${{ inputs.target }} -> target'
 
       - name: Setup Rust target directory
         run: |
