@@ -21,6 +21,12 @@ on:
           - online
           - offline
 
+      publish:
+        description: 'Publish GitHub release'
+        required: true
+        default: false
+        type: boolean
+
   workflow_call:
     inputs:
       target:
@@ -32,6 +38,9 @@ on:
         required: true
         type: string
 
+      publish:
+        required: true
+        type: boolean
 jobs:
   publish-tauri:
     permissions:
@@ -57,10 +66,6 @@ jobs:
         run: |
           echo "CARGO_TARGET_DIR=${{ github.workspace }}/target/${{ inputs.target }}" >> $GITHUB_ENV
 
-      # Cache Rust dependencies and build artifacts between GitHub Actions runs to reduce build time.
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-
       - name: install frontend dependencies
         run: pnpm install
 
@@ -79,8 +84,7 @@ jobs:
           tagName: windows-${{ inputs.build }}-${{ inputs.target }}-v__VERSION__
           releaseName: 'windows-${{ inputs.build }}-${{ inputs.target }}-v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
-          uploadWorkflowArtifacts: true
-          uploadUpdaterJson: true
-          releaseDraft: true
-          prerelease: false
-          uploadPlainBinary: false
+          uploadWorkflowArtifacts: ${{ inputs.publish }}
+          uploadUpdaterJson: ${{ inputs.publish }}
+          releaseDraft: ${{ inputs.publish }}
+

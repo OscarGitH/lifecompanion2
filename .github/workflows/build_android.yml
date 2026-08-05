@@ -21,6 +21,12 @@ on:
           - apk
           - aab
 
+      publish:
+        description: 'Publish GitHub release'
+        required: true
+        default: false
+        type: boolean
+
   workflow_call:
     inputs:
       target:
@@ -31,6 +37,9 @@ on:
         description: 'Build type'
         required: true
         type: string
+      publish:
+        required: true
+        type: boolean
 
 jobs:
   publish-tauri:
@@ -71,10 +80,6 @@ jobs:
         run: |
           echo "CARGO_TARGET_DIR=${{ github.workspace }}/target/${{ inputs.target }}" >> $GITHUB_ENV
 
-      # Cache Rust dependencies and build artifacts between GitHub Actions runs to reduce build time.
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-
       - name: install frontend dependencies
         run: pnpm install
 
@@ -85,6 +90,21 @@ jobs:
           echo "password=${{ secrets.TAURI_ANDROID_KEY_PASSWORD }}" >> keystore.properties
           base64 -d <<< "${{ secrets.TAURI_ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
           echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
+
+      - name: Setup build arguments
+        shell: bash
+        run: |
+          if [ "${{ inputs.package }}" = "aab" ]; then
+            echo "TAURI_ANDROID_PACKAGE=--aab" >> $GITHUB_ENV
+          else
+            echo "TAURI_ANDROID_PACKAGE=--apk" >> $GITHUB_ENV
+          fi
+          
+          if [ "${{ inputs.publish }}" = "true" ]; then
+            echo "TAURI_ANDROID_MODE=--release" >> $GITHUB_ENV
+          else
+            echo "TAURI_ANDROID_MODE=--debug" >> $GITHUB_ENV
+          fi
 
       # --------------------
       # Build
@@ -97,12 +117,11 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
-          args: ''
+          args: android build ${{ env.TAURI_ANDROID_PACKAGE }} ${{ env.TAURI_ANDROID_MODE }}
           tagName: android-${{ inputs.target }}-v__VERSION__
           releaseName: 'android-${{ inputs.target }}-v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
-          uploadWorkflowArtifacts: true
-          uploadUpdaterJson: true
-          releaseDraft: true
-          prerelease: false
-          uploadPlainBinary: false
+          uploadWorkflowArtifacts: ${{ inputs.publish }}
+          uploadUpdaterJson: ${{ inputs.publish }}
+          releaseDraft: ${{ inputs.publish }}
+
