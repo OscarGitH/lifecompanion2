@@ -86,12 +86,11 @@ jobs:
         with:
           projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
 
-          args: --config tauri.windows-${{ inputs.build }}.conf.json
 
-          tagName: windows-${{ inputs.build }}-${{ inputs.target }}-v__VERSION__
-
-          releaseDraft: ${{ inputs.publish }}
-          releaseName: 'windows-${{ inputs.build }}-${{ inputs.target }} v__VERSION__'
+          tagName: LifeCompanion-windows-v__VERSION__
+          releaseName: 'LifeCompanion-windows v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
+          releaseDraft: true
+          prerelease: false
 
-          uploadUpdaterJson: ${{ inputs.publish }}
+          args: --config tauri.windows-${{ inputs.build }}.conf.json
