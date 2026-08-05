@@ -16,20 +16,26 @@ jobs:
 
       matrix:
         include:
-          - platform: 'ubuntu-22.04'
-            args: ''
           - platform: 'windows-latest'
             args: '--config tauri.windows-online.conf.json'
+            mobile: ''
+          - platform: 'ubuntu-22.04'
+            args: ''
+            mobile: ''
+          - platform: 'ubuntu-22.04'
+            args: ''
+            mobile: 'android'
 
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v7
 
+
       - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04'
+        if: matrix.platform == 'ubuntu-22.04' && matrix.mobile == ''
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev
 
       - name: setup pnpm
         uses: pnpm/action-setup@v4
@@ -39,8 +45,36 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 26.x.x
+          node-version: 26.x.0
           cache: pnpm
+
+      - name: install frontend dependencies
+        run: pnpm install
+
+      - name: install Rust stable
+        if: matrix.mobile == 'android'
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - name: Set up JDK
+        if: matrix.mobile == 'android'
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        if: matrix.mobile == 'android'
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Android NDK
+        if: matrix.mobile == 'android'
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r29
+          link-to-sdk: true
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
@@ -52,8 +86,32 @@ jobs:
         run: |
           echo "CARGO_TARGET_DIR=${{ github.workspace }}/apps/lifecompanion/src-tauri/editor" >> $GITHUB_ENV
 
-      - name: install frontend dependencies
-        run: pnpm install
+      - name: init mobile project
+        if: matrix.mobile == 'android'
+        run: |
+          cd ./apps/lifecompanion/
+          pnpm dlx @tauri-apps/cli android init
+
+      - name: Setup Android signing
+        if: matrix.mobile == 'android'
+        run: |
+          cd apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android
+          echo "keyAlias=${{ secrets.TAURI_ANDROID_KEY_ALIAS }}" > keystore.properties
+          echo "password=${{ secrets.TAURI_ANDROID_KEY_PASSWORD }}" >> keystore.properties
+          base64 -d <<< "${{ secrets.TAURI_ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
+          echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
+
+      - name: Extract publication information
+        if: matrix.mobile == 'android'
+        id: publication
+        run: |
+          echo "APP_VERSION=${GITHUB_REF}" >> $GITHUB_OUTPUT
+          echo "APP_TRACK=$(echo ${GITHUB_REF} | grep -oP "(?<=-).*(?=\.)" || echo "production")" >> $GITHUB_OUTPUT
+      - name: Publication information
+        if: matrix.mobile == 'android'
+        run: |
+          echo "Version ${{ steps.publication.outputs.APP_VERSION }}."
+          echo "Publishing on track ${{ steps.publication.outputs.APP_TRACK }}."
 
       # --------------------
       # Build and Save Artifacts
@@ -71,4 +129,15 @@ jobs:
           uploadUpdaterJson: true
 
           args: `${{ matrix.args }} --release`
+
+      - name: Deploy to Google Play
+        if: matrix.mobile == 'android' && github.ref_type == 'tag'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          packageName: org.lifecompanion2.editor
+          releaseFiles: apps/lifecompanion/src-tauri/editor/gen/android/app/build/outputs/bundle/universalRelease/*.aab
+          track: ${{ env.TRACK }}
+        env:
+          TRACK: ${{ steps.publication.outputs.APP_TRACK }}
 
