@@ -41,6 +41,28 @@ make android  # Launch the Android app (via ADB)
 ```
 
 ## Publishing updates
+TODO :
+- Add in Dockerfile `RUN cargo install tauri-cli cargo-edit` line 48 and rebuild.
+- Add tauri tauri.windows-offline/online.conf.json in editor and player.
+- Add in MakeFile 
+    ```makefile
+        .PHONY: publish
+        publish:
+            @git diff --quiet || { echo "Unstaged changes found."; exit 1; }
+            @git diff --cached --quiet || { echo "Uncommitted changes found."; exit 1; }
+            @$(MAKE) lc-pnpm c="version --no-git-tag-version $(c)"
+            @$(MAKE) lc-cargo target="editor" c="set-version --manifest-path Cargo.toml $(c)"
+            @$(MAKE) lc-cargo target="player" c="set-version --manifest-path Cargo.toml $(c)"
+            @git add -A
+            @git commit -m "chore: release v$(c)"
+            @git tag "v$(c)"
+    ```
+- Add .env file at root with the following content:
+    ```env
+    TAURI_SIGNING_PRIVATE_KEY=...
+    TAURI_SIGNING_PRIVATE_KEY_PASSWORD=...
+    ```
+- Look commit 9ab81659
 
 ### Build release on local machine
 To build a release version of the application, complete the .env file with the TAURI_SIGNING_PRIVATE_KEY and TAURI_SIGNING_PRIVATE_KEY_PASSWORD variables.
