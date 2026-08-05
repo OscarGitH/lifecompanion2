@@ -25,32 +25,44 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - name: Setup build environment
-        uses: ./.github/actions/setup_build
+      - name: setup node
+        uses: actions/setup-node@v4
         with:
-          tauri-signing-private-key: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          tauri-signing-private-key-password: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          node-version: lts/*
+
+      - name: install dependencies (ubuntu only)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/lifecompanion/src-tauri/${{ inputs.target }} -> target
+
+      - name: install frontend dependencies
+        run: pnpm install
 
       # --------------------
       # Build
       # --------------------
 
-      - name: Build Linux
-        run: make build-linux target=${{ inputs.target }} bundle=true release=true
-
-      # --------------------
-      # Store artifact
-      # --------------------
-
-      - name: Store linux as artifact
-        uses: actions/upload-artifact@v4
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          name: lifecompanion-${{ inputs.target }}-linux
-          path: |
-            target/lifecompanion-${{ inputs.target }}/release/bundle/deb/*.deb
-            target/lifecompanion-${{ inputs.target }}/release/bundle/rpm/*.rpm
-            target/lifecompanion-${{ inputs.target }}/release/bundle/appimage/*.AppImage
-          if-no-files-found: error
+          projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
+          args: --config tauri.conf.json
+          tagName: linux-${{ inputs.target }}-v__VERSION__
+          releaseName: 'linux-${{ inputs.target }}-v__VERSION__'
+          workflowArtifactNamePattern: 'linux-${{ inputs.target }}-v__VERSION__'
+          releaseBody: 'See the assets to download this version and install.'
+          uploadWorkflowArtifacts: true
+          releaseDraft: false
+          prerelease: false
+          uploadPlainBinary: false
+          uploadUpdaterJson: true
