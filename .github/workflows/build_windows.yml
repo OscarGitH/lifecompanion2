@@ -48,7 +48,7 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: 26.1.0
           cache: pnpm
 
       - name: install frontend dependencies
@@ -74,11 +74,9 @@ jobs:
           args: --config tauri.windows-${{ inputs.build }}.conf.json
           tagName: windows-${{ inputs.build }}-${{ inputs.target }}-v__VERSION__
           releaseName: 'windows-${{ inputs.build }}-${{ inputs.target }}-v__VERSION__'
-          workflowArtifactNamePattern: 'windows-${{ inputs.build }}-${{ inputs.target }}-v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
           uploadWorkflowArtifacts: true
-          releaseDraft: false
+          uploadUpdaterJson: true
+          releaseDraft: true
           prerelease: false
           uploadPlainBinary: false
-          uploadUpdaterJson: true
-
