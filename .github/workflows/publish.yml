@@ -19,7 +19,7 @@ jobs:
           - platform: 'ubuntu-22.04'
             args: ''
           - platform: 'windows-latest'
-            args: '--config tauri.windows-editor.conf.json'
+            args: '--config tauri.windows-online.conf.json'
 
     runs-on: ${{ matrix.platform }}
     steps:
