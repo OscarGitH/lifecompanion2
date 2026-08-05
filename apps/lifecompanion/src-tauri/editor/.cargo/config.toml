@@ -1,2 +1,2 @@
 [build]
-target-dir = "/target/lifecompanion-editor"
+target-dir = "/app/target/lifecompanion-editor"
