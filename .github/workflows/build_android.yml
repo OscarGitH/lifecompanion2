@@ -108,6 +108,14 @@ jobs:
           cd ./apps/lifecompanion/
           pnpm dlx @tauri-apps/cli android init
 
+      - name: Setup Android signing
+        run: |
+          cd apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android
+          echo "keyAlias=${{ secrets.TAURI_ANDROID_KEY_ALIAS }}" > keystore.properties
+          echo "password=${{ secrets.TAURI_ANDROID_KEY_PASSWORD }}" >> keystore.properties
+          base64 -d <<< "${{ secrets.TAURI_ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
+          echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
+
       # --------------------
       # Build and Save Artifacts
       # --------------------
