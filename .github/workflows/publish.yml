@@ -45,12 +45,12 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: './apps/lifecompanion/src-tauri/${{ inputs.target }} -> target'
+          workspaces: './apps/lifecompanion/src-tauri/editor -> target'
 
       - name: Setup Rust target directory
         if: matrix.platform == 'ubuntu-22.04'
         run: |
-          echo "CARGO_TARGET_DIR=${{ github.workspace }}/apps/lifecompanion/src-tauri/${{ inputs.target }}" >> $GITHUB_ENV
+          echo "CARGO_TARGET_DIR=${{ github.workspace }}/apps/lifecompanion/src-tauri/editor" >> $GITHUB_ENV
 
       - name: install frontend dependencies
         run: pnpm install
@@ -64,7 +64,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
+          projectPath: apps/lifecompanion/src-tauri/editor
 
           uploadWorkflowArtifacts: true
           uploadUpdaterSignatures: true
