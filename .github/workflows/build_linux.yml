@@ -50,10 +50,6 @@ jobs:
         with:
           workspaces: './apps/lifecompanion/src-tauri/${{ inputs.target }} -> target'
 
-      - name: Setup Rust target directory
-        run: |
-          echo "CARGO_TARGET_DIR=${{ github.workspace }}/apps/lifecompanion/src-tauri/${{ inputs.target }}" >> $GITHUB_ENV
-
       - name: install frontend dependencies
         run: pnpm install
 

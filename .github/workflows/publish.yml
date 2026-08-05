@@ -7,25 +7,68 @@ on:
       - 'v*.*.*'
 
 jobs:
+  publish:
+    permissions:
+      contents: write
 
-  linux:
-    uses: ./.github/workflows/build_linux.yml
-    with:
-      target: editor
+    strategy:
+      fail-fast: false
 
-  windows-online:
-    uses: ./.github/workflows/build_windows.yml
-    with:
-      target: editor
-      build: windows - online
+      matrix:
+        include:
+          - platform: 'ubuntu-22.04'
+            args: ''
+          - platform: 'windows-latest'
+            args: '--config tauri.windows-editor.conf.json'
 
-  windows-offline:
-    uses: ./.github/workflows/build_windows.yml
-    with:
-      target: editor
-      build: windows - offline
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v7
 
-  android:
-    uses: ./.github/workflows/publish_android.yml
-    with:
-      target: editor
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
+
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.3
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 26.1.0
+          cache: pnpm
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './apps/lifecompanion/src-tauri/${{ inputs.target }} -> target'
+
+      - name: Setup Rust target directory
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          echo "CARGO_TARGET_DIR=${{ github.workspace }}/apps/lifecompanion/src-tauri/${{ inputs.target }}" >> $GITHUB_ENV
+
+      - name: install frontend dependencies
+        run: pnpm install
+
+      # --------------------
+      # Build and Save Artifacts
+      # --------------------
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
+
+          uploadWorkflowArtifacts: true
+          uploadUpdaterSignatures: true
+          uploadUpdaterJson: true
+
+          args: ${{ matrix.args }}
+
