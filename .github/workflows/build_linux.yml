@@ -27,17 +27,19 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.3
+
       - name: setup node
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
           cache: pnpm
 
-      - name: setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11.1.3
-      - run: pnpm install
+      - name: install frontend dependencies
+        run: pnpm install
 
       - name: install dependencies (ubuntu only)
         run: |
@@ -49,9 +51,6 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: apps/lifecompanion/src-tauri/${{ inputs.target }} -> target
-
-      - name: install frontend dependencies
-        run: pnpm install
 
       # --------------------
       # Build
