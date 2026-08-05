@@ -90,7 +90,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: apps/lifecompanion/src-tauri/${{ inputs.target }}
-          args: --config tauri.android.conf.json
+          args: --config tauri.conf.json
           tagName: android-${{ inputs.target }}-v__VERSION__
           releaseName: 'android-${{ inputs.target }}-v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
