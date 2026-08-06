@@ -1,6 +1,6 @@
 [package]
 name = "lifecompanion-player"
-version = "0.1.3"
+version = "0.1.4"
 description = "LifeCompanion player app"
 edition = "2021"
 
