@@ -1,7 +1,6 @@
 name: 'publish'
 
 on:
-  workflow_dispatch:
   push:
     tags:
       - 'v*.*.*'
@@ -95,7 +94,7 @@ jobs:
       - name: Setup Android signing
         if: matrix.mobile == 'android'
         run: |
-          cd apps/lifecompanion/src-tauri/${{ inputs.target }}/gen/android
+          cd apps/lifecompanion/src-tauri/editor/gen/android
           echo "keyAlias=${{ secrets.TAURI_ANDROID_KEY_ALIAS }}" > keystore.properties
           echo "password=${{ secrets.TAURI_ANDROID_KEY_PASSWORD }}" >> keystore.properties
           base64 -d <<< "${{ secrets.TAURI_ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
@@ -128,7 +127,7 @@ jobs:
           uploadUpdaterSignatures: true
           uploadUpdaterJson: true
 
-          args: `${{ matrix.args }} --release`
+          args: "${{ matrix.args }} --release"
 
       - name: Deploy to Google Play
         if: matrix.mobile == 'android' && github.ref_type == 'tag'
