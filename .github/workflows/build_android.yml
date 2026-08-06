@@ -81,7 +81,6 @@ jobs:
       - name: Install Tauri CLI
         run: |
           cargo install tauri-cli --version "^2"
-          tauri --version
           cargo tauri --version
 
       - name: Set up JDK
