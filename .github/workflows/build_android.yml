@@ -134,6 +134,6 @@ jobs:
           uploadWorkflowArtifacts: true
           uploadUpdaterSignatures: false
 
-          args: '-verbose --${{ inputs.build }} --${{ inputs.status }}'
+          args: '--verbose --${{ inputs.build }} --${{ inputs.status }}'
 
           mobile: 'android'
