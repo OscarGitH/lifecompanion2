@@ -115,6 +115,23 @@ jobs:
       # Build and Save Artifacts
       # --------------------
 
+      - name: Compute build args
+        id: build_args
+        shell: bash
+        run: |
+          ARGS=""
+          
+          if [ "${{ inputs.status }}" = "debug" ]; then
+            ARGS="$ARGS --debug"
+          fi
+          
+          if [ "${{ inputs.build }}" = "apk" ]; then
+            ARGS="$ARGS --apk --target aarch64"
+          else
+            ARGS="$ARGS --aab"
+          fi
+          echo "ARGS=$ARGS" >> "$GITHUB_OUTPUT"
+
       - uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -129,6 +146,6 @@ jobs:
           uploadWorkflowArtifacts: true
           uploadUpdaterSignatures: false
 
-          args: '--verbose --debug --apk --target aarch64'
+          args: ${{ steps.build_args.outputs.ARGS }}
 
           mobile: 'android'
