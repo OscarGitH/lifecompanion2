@@ -99,9 +99,6 @@ jobs:
         with:
           workspaces: './apps/target/lifecompanion/src-tauri/${{ inputs.target }} -> ../../target'
 
-      - name: Install Tauri CLI
-        run: pnpm add -D @tauri-apps/cli@v2
-
       - name: Setup Rust target directory
         run: |
           echo "CARGO_TARGET_DIR=${{ github.workspace }}/apps/target/lifecompanion/src-tauri/${{ inputs.target }}" >> $GITHUB_ENV
