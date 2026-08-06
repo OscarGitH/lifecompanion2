@@ -111,7 +111,7 @@ jobs:
       - name: init mobile project
         run: |
           cd apps/lifecompanion
-          pnpm dlx @tauri-apps/cli android init
+          cargo tauri android init
 
       - name: Setup Android signing
         run: |
