@@ -105,7 +105,7 @@ jobs:
 
       - name: init mobile project
         run: |
-          cd ./apps/lifecompanion/
+          cd apps/lifecompanion/src-tauri/editor
           pnpm dlx @tauri-apps/cli android init
 
       - name: Setup Android signing
