@@ -67,7 +67,7 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 26.x.0
+          node-version: 22.x.x
           cache: pnpm
 
       - name: install frontend dependencies
@@ -77,6 +77,14 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - name: Install cargo-tauri
+        run: cargo install tauri-cli --locked
+
+      - name: Debug cargo
+        run: |
+          cargo tauri --version
+          cargo --list | grep tauri
 
       - name: Set up JDK
         uses: actions/setup-java@v5
