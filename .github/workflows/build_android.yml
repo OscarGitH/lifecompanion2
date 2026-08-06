@@ -116,15 +116,6 @@ jobs:
           base64 -d <<< "${{ secrets.TAURI_ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
           echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
 
-      - name: Debug cargo
-        run: |
-          cargo --version
-          cargo --list
-          which cargo
-          which tauri || true
-          cargo tauri --version || true
-          tauri --version || true
-
       # --------------------
       # Build and Save Artifacts
       # --------------------
