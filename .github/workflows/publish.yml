@@ -6,7 +6,43 @@ on:
       - 'v*.*.*'
 
 jobs:
-  publish:
+  create-release:
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      release_id: ${{ steps.create-release.outputs.result }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        run: |
+          echo "VERSION=$(node -p "require('./apps/lifecompanion/package.json').version")" >> $GITHUB_ENV
+
+      - name: Create GitHub release
+        id: create-release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const release = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: context.ref.replace('refs/tags/', ''),
+              name: `Life Companion ${process.env.VERSION}`,
+              body: 'Download the latest version.',
+              draft: true,
+              prerelease: false
+            })
+
+            return release.data.id
+
+  build-tauri:
+    needs: [create-release]
+
     permissions:
       contents: write
 
@@ -17,12 +53,12 @@ jobs:
         include:
           - platform: 'windows-latest'
             args: '--config tauri.windows-online.conf.json'
-            mobile: ''
+          - platform: 'windows-latest'
+            args: '--config tauri.windows-offline.conf.json'
           - platform: 'ubuntu-22.04'
             args: ''
-            mobile: ''
           - platform: 'ubuntu-22.04'
-            args: ''
+            args: '--aab'
             mobile: 'android'
 
     runs-on: ${{ matrix.platform }}
@@ -31,7 +67,7 @@ jobs:
 
 
       - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04' && matrix.mobile == ''
+        if: matrix.platform == 'ubuntu-22.04' && matrix.mobile != 'android'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev
@@ -75,11 +111,6 @@ jobs:
           ndk-version: r29
           link-to-sdk: true
 
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: './apps/lifecompanion/src-tauri/editor -> target'
-
       - name: Setup Rust target directory
         if: matrix.platform == 'ubuntu-22.04'
         run: |
@@ -88,7 +119,7 @@ jobs:
       - name: init mobile project
         if: matrix.mobile == 'android'
         run: |
-          cd ./apps/lifecompanion/
+          cd ./apps/lifecompanion/src-tauri/editor
           pnpm dlx @tauri-apps/cli android init
 
       - name: Setup Android signing
@@ -106,6 +137,7 @@ jobs:
         run: |
           echo "APP_VERSION=${GITHUB_REF}" >> $GITHUB_OUTPUT
           echo "APP_TRACK=$(echo ${GITHUB_REF} | grep -oP "(?<=-).*(?=\.)" || echo "production")" >> $GITHUB_OUTPUT
+
       - name: Publication information
         if: matrix.mobile == 'android'
         run: |
@@ -113,7 +145,7 @@ jobs:
           echo "Publishing on track ${{ steps.publication.outputs.APP_TRACK }}."
 
       # --------------------
-      # Build and Save Artifacts
+      # Build
       # --------------------
       - uses: tauri-apps/tauri-action@v1
         env:
@@ -123,14 +155,15 @@ jobs:
         with:
           projectPath: apps/lifecompanion/src-tauri/editor
 
-          uploadWorkflowArtifacts: true
+          releaseId: ${{ needs.create-release.outputs.release_id }}
           uploadUpdaterSignatures: true
           uploadUpdaterJson: true
 
-          args: "${{ matrix.args }} --release"
+          args: "${{ matrix.args }}"
+          mobile: ${{ matrix.mobile }}
 
       - name: Deploy to Google Play
-        if: matrix.mobile == 'android' && github.ref_type == 'tag'
+        if: matrix.mobile == 'android' && github.ref_type == 'tag' && false == true
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
@@ -139,4 +172,27 @@ jobs:
           track: ${{ env.TRACK }}
         env:
           TRACK: ${{ steps.publication.outputs.APP_TRACK }}
+
+  publish-release:
+    needs: [create-release, build-tauri]
+
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Publish release
+        uses: actions/github-script@v7
+        env:
+          RELEASE_ID: ${{ needs.create-release.outputs.release_id }}
+        with:
+          script: |
+            await github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: process.env.RELEASE_ID,
+              draft: false,
+              prerelease: false
+            })
 
