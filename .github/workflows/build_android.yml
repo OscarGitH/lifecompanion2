@@ -78,14 +78,6 @@ jobs:
         with:
           targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
 
-      - name: Install cargo-tauri
-        run: cargo install tauri-cli --locked
-
-      - name: Debug cargo
-        run: |
-          cargo tauri --version
-          cargo --list | grep tauri
-
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -106,6 +98,9 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './apps/target/lifecompanion/src-tauri/${{ inputs.target }} -> ../../target'
+
+      - name: Install Tauri CLI
+        run: pnpm add -D @tauri-apps/cli@v2
 
       - name: Setup Rust target directory
         run: |
@@ -142,6 +137,6 @@ jobs:
           uploadWorkflowArtifacts: true
           uploadUpdaterSignatures: false
 
-          args: '--verbose --${{ inputs.build }} --${{ inputs.status }}'
+          args: '--verbose --debug --apk --target aarch64
 
           mobile: 'android'
