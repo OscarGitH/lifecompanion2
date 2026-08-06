@@ -137,6 +137,6 @@ jobs:
           uploadWorkflowArtifacts: true
           uploadUpdaterSignatures: false
 
-          args: '--verbose --debug --apk --target aarch64
+          args: '--verbose --debug --apk --target aarch64'
 
           mobile: 'android'
