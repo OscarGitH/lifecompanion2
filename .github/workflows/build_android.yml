@@ -105,7 +105,7 @@ jobs:
 
       - name: init mobile project
         run: |
-          cd apps/lifecompanion/src-tauri/editor
+          cd apps/lifecompanion
           pnpm dlx @tauri-apps/cli android init
 
       - name: Setup Android signing
@@ -143,6 +143,6 @@ jobs:
           uploadWorkflowArtifacts: true
           uploadUpdaterSignatures: false
 
-          args: '--${{ inputs.build }} --${{ inputs.status }}'
+          args: '-verbose --${{ inputs.build }} --${{ inputs.status }}'
 
           mobile: 'android'
