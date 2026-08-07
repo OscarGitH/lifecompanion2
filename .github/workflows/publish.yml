@@ -51,15 +51,15 @@ jobs:
 
       matrix:
         include:
-          - platform: 'windows-latest'
-            args: '--config tauri.windows-online.conf.json'
-          - platform: 'windows-latest'
-            args: '--config tauri.windows-offline.conf.json'
+#          - platform: 'windows-latest'
+#            args: '--config tauri.windows-online.conf.json'
+#          - platform: 'windows-latest'
+#            args: '--config tauri.windows-offline.conf.json'
           - platform: 'ubuntu-22.04'
             args: ''
-          - platform: 'ubuntu-22.04'
-            args: '--aab'
-            mobile: 'android'
+#          - platform: 'ubuntu-22.04'
+#            args: '--aab'
+#            mobile: 'android'
 
     runs-on: ${{ matrix.platform }}
     steps:
