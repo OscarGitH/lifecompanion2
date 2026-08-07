@@ -73,6 +73,13 @@ Then run the following example command to build the Windows release:
 make windows-build target=editor bundle=true release=true
 ```
 
+```bash
+make lc-pnpm c="tauri add updater" target="shared"
+make lc-cargo c="tauri add updater" target="shared"
+```
+
+add in libs.rs `.plugin(tauri_plugin_updater::Builder::new().build());`
+
 
 ### Deployment
 To deploy a new version, just bump a new NPM version using:

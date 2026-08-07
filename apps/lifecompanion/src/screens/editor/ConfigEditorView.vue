@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { mdiMinus, mdiPlus } from "@mdi/js";
-import { computed, provide, ref, watch } from "vue";
+import { relaunch } from "@tauri-apps/plugin-process";
+import { check, type Update } from "@tauri-apps/plugin-updater";
+import { computed, onMounted, provide, ref, watch } from "vue";
 import AppBar from "../../components/editor/AppBar.vue";
 import EditableCell from "../../components/editor/grid/EditableCell.vue";
 import LockedGridLayer from "../../components/editor/grid/LockedGridLayer.vue";
@@ -113,6 +115,46 @@ watch(
 	},
 	{ deep: true },
 );
+
+const updateAvailable = ref<Update | null>(null);
+const updateProgress = ref<number | null>(null); // pourcentage 0-100
+const updateReady = ref(false); // téléchargement terminé, en attente de relance
+
+onMounted(async () => {
+	try {
+		const update = await check();
+		if (update?.available) {
+			updateAvailable.value = update;
+			await downloadUpdate(update);
+		}
+	} catch (error) {
+		console.error("update check error:", error);
+	}
+});
+
+const downloadUpdate = async (update: Update) => {
+	let downloaded = 0;
+	let contentLength = 0;
+
+	await update.downloadAndInstall((event) => {
+		switch (event.event) {
+			case "Started":
+				contentLength = event.data.contentLength ?? 0;
+				updateProgress.value = 0;
+				break;
+			case "Progress":
+				downloaded += event.data.chunkLength;
+				updateProgress.value = contentLength
+					? Math.round((downloaded / contentLength) * 100)
+					: null;
+				break;
+			case "Finished":
+				updateProgress.value = 100;
+				updateReady.value = true;
+				break;
+		}
+	});
+};
 </script>
 
 <template>
@@ -159,6 +201,38 @@ watch(
 						/>
 						<v-btn :icon="mdiPlus" @click="zoomIn" />
 					</LcBtnGroup>
+
+					<v-spacer />
+
+					<v-snackbar
+						:model-value="updateAvailable && !updateReady"
+						:timeout="-1"
+						location="bottom right"
+					>
+						Téléchargement de la mise à jour {{ updateAvailable?.version }}...
+						<v-progress-linear
+							:model-value="updateProgress ?? 0"
+							height="6"
+							color="primary"
+							class="mt-2"
+						/>
+						<span class="text-caption">{{ updateProgress ?? 0 }}%</span>
+					</v-snackbar>
+
+					<v-snackbar
+						:model-value="updateReady"
+						:timeout="-1"
+						location="bottom right"
+						color="success"
+					>
+						Mise à jour {{ updateAvailable?.version }} prête. Redémarrez l'app
+						pour l'appliquer.
+						<template #actions>
+							<v-btn variant="text" @click="relaunch()"
+								>Relancer maintenant</v-btn
+							>
+						</template>
+					</v-snackbar>
 
 					<v-spacer />
 
